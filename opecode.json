@@ -1,0 +1,19 @@
+{
+  "version": "1.0",
+  "model": "",
+  "instructions": [
+    "./AGENTS.md",
+    "./ARCHITECTURE.md",
+    "./WORKFLOW.md",
+    "./PROJECT.md"
+  ],
+  "tools": {
+    "runCommands": true,
+    "fileEditing": true
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.env*",
+    "**/dist/**"
+  ]
+}

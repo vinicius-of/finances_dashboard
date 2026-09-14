@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title><%= it.title %></title>
+    <style>
+        body { font-family: system-ui, sans-serif; text-align: center; padding: 3rem; }
+        h1 { color: #e53e3e; }
+    </style>
+</head>
+<body>
+    <h1>404 - Página Não Encontrada</h1>
+    <p><%= it.message %></p>
+    <a href="/">Voltar para o início</a>
+</body>
+</html>
