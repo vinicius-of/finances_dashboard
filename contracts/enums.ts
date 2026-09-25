@@ -1,7 +1,32 @@
-export type VentureCategory = "FIXED" | "VARIABLE";
+export const VentureCategory = {
+  FIXED: "FIXED",
+  VARIABLE: "VARIABLE",
+} as const;
+export type VentureCategory =
+  (typeof VentureCategory)[keyof typeof VentureCategory];
 
-export type VentureType = "TREASURY" | "CDB" | "LCI" | "LCA" | "STOCK" | "FII";
+export const VentureType = {
+  TREASURY: "TREASURY",
+  CDB: "CDB",
+  LCI: "LCI",
+  LCA: "LCA",
+  STOCK: "STOCK",
+  FII: "FII",
+} as const;
+export type VentureType = (typeof VentureType)[keyof typeof VentureType];
 
-export type IndexerType = "CDI" | "IPCA" | "SELIC" | "PRE" | "FIXED";
+export const IndexerType = {
+  CDI: "CDI",
+  IPCA: "IPCA",
+  SELIC: "SELIC",
+  PRE: "PRE",
+  FIXED: "FIXED",
+} as const;
+export type IndexerType = (typeof IndexerType)[keyof typeof IndexerType];
 
-export type SnapshotType = "MONTHLY_RECORD" | "CONTRIBUTION" | "WITHDRAWAL";
+export const SnapshotType = {
+  MONTHLY_RECORD: "MONTHLY_RECORD",
+  CONTRIBUTION: "CONTRIBUTION",
+  WITHDRAWAL: "WITHDRAWAL",
+} as const;
+export type SnapshotType = (typeof SnapshotType)[keyof typeof SnapshotType];
