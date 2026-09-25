@@ -26,14 +26,16 @@
 
 ## 3. Estrutura de Diretórios
 
-| Diretório/Arquivo | Responsabilidade                                                                     | Regras                                                                                                                                             |
-| ----------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `static/`         | Arquivos, utilitários e scripts concretos.                                           | Sem importações que exijam mudanças para funcionamento adequado.                                                                                   |
-| `src/`            | Todo o código-fonte do projeto: APIs, rotas, middlewares, views e regras de negócio. | —                                                                                                                                                  |
-| `contracts/`      | Representações de objetos reais (interfaces).                                        | **Fonte de verdade** para a representação desses objetos. Manter interfaces isoladas de implementação e **sem importações externas** ao diretório. |
-| `database/`       | Configurações, modelagem, seeds e migrations do banco.                               | —                                                                                                                                                  |
-| `index.ts`        | Arquivo de execução inicial (entry point).                                           | —                                                                                                                                                  |
-| `Dockerfile`      | Preparação da imagem Docker.                                                         | —                                                                                                                                                  |
+| Diretório/Arquivo       | Responsabilidade                                                                     | Regras                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `static/`               | Arquivos, utilitários e scripts concretos.                                           | Sem importações que exijam mudanças para funcionamento adequado.                                                                                   |
+| `src/`                  | Todo o código-fonte do projeto: APIs, rotas, middlewares, views e regras de negócio. | —                                                                                                                                                  |
+| `src/repositories/`     | Repositórios de acesso a dados (um módulo por model).                                | Consomem o client via `database/` e modelos/tipos via `src/configs/database/`; leituras filtram soft-delete.                                       |
+| `src/configs/database/` | Bridge que expõe os models do banco e os tipos inferidos para `src/`.                | Não instancia o client do banco (importa de `database/models`).                                                                                    |
+| `contracts/`            | Representações de objetos reais (interfaces).                                        | **Fonte de verdade** para a representação desses objetos. Manter interfaces isoladas de implementação e **sem importações externas** ao diretório. |
+| `database/`             | Configurações, modelagem, seeds e migrations do banco.                               | —                                                                                                                                                  |
+| `index.ts`              | Arquivo de execução inicial (entry point).                                           | —                                                                                                                                                  |
+| `Dockerfile`            | Preparação da imagem Docker.                                                         | —                                                                                                                                                  |
 
 ## 4. Arquivos de Referência para Agentes
 

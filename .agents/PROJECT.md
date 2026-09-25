@@ -17,15 +17,16 @@ Este documento descreve os **diretórios do projeto e suas responsabilidades**. 
 ## Estrutura de Diretórios
 
 ```
-├── contracts/     # Contratos de domínio (tipos e interfaces) — fonte de verdade
-├── database/      # Camada de persistência: modelos, migrations e seeds (Drizzle)
-├── src/           # Código-fonte da aplicação
-│   ├── api/       #   Camada HTTP: guards, middlewares, routes e services
-│   ├── configs/   #   Configurações da aplicação
-│   ├── errors/    #   Hierarquia de erros de domínio
-│   ├── utils/     #   Funções utilitárias
-│   └── views/     #   Templates ETA (renderização SSR)
-└── static/        # Configurações estáticas (favicon, headers, caminhos raiz)
+├── contracts/            # Contratos de domínio (tipos e interfaces) — fonte de verdade
+├── database/             # Camada de persistência: modelos, migrations e seeds (Drizzle)
+├── src/                  # Código-fonte da aplicação
+│   ├── api/              #   Camada HTTP: guards, middlewares, controllers e services
+│   ├── configs/          #   Configurações da aplicação (inclui o bridge de banco em `configs/database/`)
+│   ├── errors/           #   Hierarquia de erros de domínio
+│   ├── repositories/     #   Repositórios de acesso a dados (um módulo por model)
+│   ├── utils/            #   Funções utilitárias
+│   └── views/            #   Templates ETA (renderização SSR)
+└── static/               # Configurações estáticas (favicon, headers, caminhos raiz)
 ```
 
 ---
@@ -77,14 +78,18 @@ Estrutura em camadas para tratamento de requisições HTTP:
 | -------------- | ------------------------------------------------------------------------ |
 | `guards/`      | Proteção/validação de acesso a rotas ou recursos                         |
 | `middlewares/` | Processamento intermediário de requisições (autenticação, logging, etc.) |
-| `routes/`      | Definição das rotas e seus handlers                                      |
+| `controllers/` | Handlers das rotas (recepção da requisição e montagem da resposta)       |
 | `services/`    | Regras de negócio e orquestração de dados                                |
 
 > Obs.: atualmente é um scaffold (diretórios vazios) aguardando implementação.
 
 ### `src/configs/` — Configurações
 
-Configurações gerais da aplicação (atualmente vazio; destinado a centralizar inicializações de ambiente).
+Configurações gerais da aplicação e inicializações de ambiente.
+
+| Item                | Responsabilidade                                                                                                                                                                                                                               |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `database/index.ts` | Bridge de banco: re-exporta os modelos (`ventures`, `ventureSnapshots`) e os tipos inferidos (`SelectVenture`, `InsertVenture`, `SelectVentureSnapshot`, `InsertVentureSnapshot`) para uso dentro de `src/`, sem instanciar o client do banco. |
 
 ### `src/errors/` — Hierarquia de Erros
 
@@ -93,6 +98,22 @@ Tratamento de erros baseado em classes de domínio:
 - `AppError` — classe abstrata base (recebe `statusCode` e `message`, exige `handle()`).
 - `ApiError` — erros para respostas **JSON** de API (`Response.json`).
 - `ViewError` — erros para renderização de **páginas SSR** via ETA.
+
+### `src/repositories/` — Repositórios de Acesso a Dados
+
+Camada única de acesso ao banco para o `src/`: um módulo por model, com os métodos básicos `get`, `getAll`, `post`, `batchInsert`, `patch`, `softDelete` e `restore`.
+
+| Arquivo               | Responsabilidade                                                         |
+| --------------------- | ------------------------------------------------------------------------ |
+| `ventures.ts`         | Repositório do model `ventures` (`venturesRepository`).                  |
+| `ventureSnapshots.ts` | Repositório do model `venture_snapshots` (`ventureSnapshotsRepository`). |
+| `index.ts`            | Barrel da camada (re-exporta os repositórios).                           |
+
+**Regras**:
+
+- Leituras ignoram registros soft-deletados (`deleted_at IS NULL`); a exclusão é sempre lógica (`softDelete`).
+- `db` vem de `@/database`; modelos e tipos vêm de `src/configs/database` (bridge) — os repositórios não importam `database/models` diretamente.
+- Registro inexistente ou soft-deletado retorna `undefined`; erros HTTP/SSR (`ApiError`/`ViewError`) ficam nas camadas de serviço/controller.
 
 ### `src/utils/` — Utilitários
 
