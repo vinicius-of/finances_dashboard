@@ -22,6 +22,7 @@
   - `PascalCase` para classes, tipos e enums.
   - Interfaces de contrato com prefixo `I` (ex.: `IVenture`, `IVentureSnapshot`).
 - **Formatação**: Sempre formatar o código usando as configurações padrão do repositório.
+- **Path Alias (prioridade)**: sempre dar prioridade a imports via alias do TypeScript (`@/...`) em vez de caminhos relativos — ex.: `@/database`, `@/src/repositories`, `@/contracts`. Usar caminho relativo apenas quando não houver alias aplicável.
 - **Tratamento de Erros**: Não suprimir erros. Usar classes de erro específicas de domínio que herdam de `AppError` (ex.: `ApiError` para respostas JSON de API e `ViewError` para renderização de páginas SSR).
 - **Restrição de Comentários**: Não utilizar de comentários dentro do código se não for requerido pelo desenvolvedor.
 - **Relatório de Atividade (resumo)**: Ao finalizar uma tarefa, reportar de forma resumida e objetiva — apenas o essencial (arquivos alterados, validações executadas e pontos de atenção) — sem narrar passo a passo, evitando inchar o relatório e dificultar a revisão do desenvolvedor.

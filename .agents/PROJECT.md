@@ -103,15 +103,17 @@ Tratamento de erros baseado em classes de domínio:
 
 Camada única de acesso ao banco para o `src/`: um módulo por model, com os métodos básicos `get`, `getAll`, `post`, `batchInsert`, `patch`, `softDelete` e `restore`.
 
-| Arquivo               | Responsabilidade                                                         |
-| --------------------- | ------------------------------------------------------------------------ |
-| `ventures.ts`         | Repositório do model `ventures` (`venturesRepository`).                  |
-| `ventureSnapshots.ts` | Repositório do model `venture_snapshots` (`ventureSnapshotsRepository`). |
-| `index.ts`            | Barrel da camada (re-exporta os repositórios).                           |
+| Arquivo               | Responsabilidade                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `repository.ts`       | Interface genérica `Repository<TSelect, TInsert, TPatch>` (contrato dos repositórios). |
+| `ventures.ts`         | Repositório do model `ventures` (`venturesRepository`).                                |
+| `ventureSnapshots.ts` | Repositório do model `venture_snapshots` (`ventureSnapshotsRepository`).               |
+| `index.ts`            | Barrel da camada (re-exporta os repositórios).                                         |
 
 **Regras**:
 
 - Leituras ignoram registros soft-deletados (`deleted_at IS NULL`); a exclusão é sempre lógica (`softDelete`).
+- Todo repositório implementa a interface genérica `Repository<TSelect, TInsert, TPatch>` (`repository.ts`) via `satisfies`, garantindo os 7 métodos básicos.
 - `db` vem de `@/database`; modelos e tipos vêm de `src/configs/database` (bridge) — os repositórios não importam `database/models` diretamente.
 - Registro inexistente ou soft-deletado retorna `undefined`; erros HTTP/SSR (`ApiError`/`ViewError`) ficam nas camadas de serviço/controller.
 

@@ -256,11 +256,11 @@ Fluxo de migrações do projeto (geração, formato dos arquivos e comandos).
 
 ### Detalhes
 
-- Importa de `@/database/models` — **não** de `@/database` — para não instanciar o client/abrir a conexão SQLite ao importar (o barrel raiz reexporta `db`; o client é singleton de módulo, ver `#mem-2026-010`).
+- Importa os schemas de `@/database/models`.
 - Reexporta os schemas: `ventures` e `ventureSnapshots`.
 - Expõe os tipos inferidos: `SelectVenture`/`InsertVenture` e `SelectVentureSnapshot`/`InsertVentureSnapshot` (derivados de `$inferSelect`/`$inferInsert`, ver `#mem-2026-014`).
 - Uso dentro de `src/`: `import { ventures } from "@/src/configs/database"` e `import type { InsertVenture } from "@/src/configs/database"`.
-- O client (`db`) continua sendo importado de `@/database`.
+- **Atualização (2026-09-25)**: o bridge passou a reexportar também o client (`export const db = Database`, importado de `@/database`) — o racional anterior de "não instanciar o client" não vale mais. O client é consumido de `@/database` (regra de alias no `AGENTS.md` §2).
 
 ### Referências
 

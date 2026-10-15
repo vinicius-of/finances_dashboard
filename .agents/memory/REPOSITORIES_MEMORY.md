@@ -21,11 +21,11 @@ ID nova: siga a sequência global do `INDEX.md` (formato `MEM-<AAAA>-<NNN>`).
 - **Criada em**: 2026-09-25
 - **Atualizada em**: 2026-09-25
 - **Tags**: `src`, `repositories`, `data-access`, `soft-delete`
-- **Fonte**: `src/repositories/ventures.ts`, `src/repositories/ventureSnapshots.ts`, `src/repositories/index.ts`
+- **Fonte**: `src/repositories/repository.ts`, `src/repositories/ventures.ts`, `src/repositories/ventureSnapshots.ts`, `src/repositories/index.ts`
 
 ### Descrição
 
-Cada model do banco tem um repositório (objeto de módulo) com os métodos básicos `get`, `getAll`, `post`, `batchInsert`, `patch`, `softDelete` e `restore`. Exports: `venturesRepository` e `ventureSnapshotsRepository` (barrel em `src/repositories/index.ts`).
+Cada model do banco tem um repositório (objeto de módulo) com os métodos básicos `get`, `getAll`, `post`, `batchInsert`, `patch`, `softDelete` e `restore`. O contrato é formalizado pela interface genérica `Repository<TSelect, TInsert, TPatch>` e aplicado em cada repositório via `satisfies`. Exports: `Repository`, `venturesRepository` e `ventureSnapshotsRepository` (barrel em `src/repositories/index.ts`).
 
 ### Detalhes
 
@@ -37,6 +37,8 @@ Cada model do banco tem um repositório (objeto de módulo) com os métodos bás
 - Registro inexistente ou fora do filtro de soft-delete → `undefined`; erros HTTP/SSR ficam em `services`/`controllers` (`ApiError`/`ViewError`).
 - Retorno: linha crua do banco (`Select*` importado de `@/src/configs/database`; datas em `string` ISO, com `deletedAt`).
 - `db` é importado de `@/database`; modelos e tipos, de `@/src/configs/database` (bridge).
+- Cada repositório declara `satisfies Repository<Select*, Insert*, Patch*>`: a interface genérica (`src/repositories/repository.ts`, 3 parâmetros de tipo) garante os 7 métodos no typecheck — desvios falham na compilação (comprovado por verificação negativa).
+- Interface de **tipos** apenas; não há factory/base genérica de runtime (decisão em `#mem-2026-020`).
 
 ### Referências
 
@@ -68,6 +70,8 @@ A camada de repositórios usa **dois módulos explícitos** (`ventures.ts` e `ve
 - Classes com injeção de `db`: cerimônia desnecessária — o projeto usa `db` singleton e as camadas previstas são funções.
 
 **Consequência**: o padrão dos métodos é repetido entre os arquivos; manter ordem e assinaturas idênticas entre eles para facilitar leitura e diffs.
+
+**Atualização (2026-09-25)**: o descarte vale para a base/factory genérica de **runtime**. Uma **interface genérica de tipos** (`Repository<TSelect, TInsert, TPatch>`, `src/repositories/repository.ts`, ver `#mem-2026-019`) é aceita e padroniza a criação de novos repositórios.
 
 ### Referências
 
