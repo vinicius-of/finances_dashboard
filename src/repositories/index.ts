@@ -1,2 +1,2 @@
-export * from "./ventures";
-export * from "./ventureSnapshots";
+export * as VenturesRepository from "@/src/repositories/ventures";
+export * as VentureSnapshotsRepository from "@/src/repositories/ventureSnapshots";

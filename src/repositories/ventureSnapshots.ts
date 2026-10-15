@@ -5,6 +5,7 @@ import type {
   InsertVentureSnapshot,
   SelectVentureSnapshot,
 } from "@/src/configs/database";
+import type { Repository } from "@/src/repositories/repository";
 
 export type PatchVentureSnapshot = Partial<
   Omit<InsertVentureSnapshot, "id" | "createdAt" | "updatedAt" | "deletedAt">
@@ -76,4 +77,8 @@ export const ventureSnapshotsRepository = {
       .returning()
       .get();
   },
-};
+} satisfies Repository<
+  SelectVentureSnapshot,
+  InsertVentureSnapshot,
+  PatchVentureSnapshot
+>;

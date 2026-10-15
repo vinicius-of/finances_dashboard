@@ -1,7 +1,8 @@
 import { and, eq, isNotNull, isNull } from "drizzle-orm";
-import { db } from "@/src/configs/database";
+import { db } from "@/database";
 import { ventures } from "@/src/configs/database";
 import type { InsertVenture, SelectVenture } from "@/src/configs/database";
+import type { Repository } from "@/src/repositories/repository";
 
 export type PatchVenture = Partial<
   Omit<InsertVenture, "id" | "createdAt" | "updatedAt" | "deletedAt">
@@ -58,4 +59,4 @@ export const venturesRepository = {
       .returning()
       .get();
   },
-};
+} satisfies Repository<SelectVenture, InsertVenture, PatchVenture>;
