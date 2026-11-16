@@ -2,10 +2,11 @@
   "version": "1.0",
   "model": "",
   "instructions": [
-    "./AGENTS.md",
-    "./ARCHITECTURE.md",
-    "./WORKFLOW.md",
-    "./PROJECT.md"
+    "./.agents/AGENTS.md",
+    "./.agents/RESTRICTIONS.md",
+    "./.agents/ARCHITECTURE.md",
+    "./.agents/PROJECT.md",
+    "./.agents/workflow/DEFAULT_EXECUTE.md"
   ],
   "tools": {
     "runCommands": true,
@@ -14,6 +15,7 @@
   "ignorePatterns": [
     "**/node_modules/**",
     "**/.env*",
-    "**/dist/**"
+    "**/dist/**",
+    "**/assets/**"
   ]
 }
