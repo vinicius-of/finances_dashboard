@@ -1,0 +1,12 @@
+<nav class="app-sidebar" aria-label="Menu principal">
+    <ul class="app-menu list-unstyled mb-0">
+        <% it.items.forEach((item) => { %>
+            <li>
+                <a href="<%= item.href %>" class="app-menu__link<%= item.key === it.active ? " app-menu__link--active" : "" %>"<% if (item.key === it.active) { %> aria-current="page"<% } %>>
+                    <i class="bi <%= item.icon %>" aria-hidden="true"></i>
+                    <span class="app-menu__label"><%= item.label %></span>
+                </a>
+            </li>
+        <% }) %>
+    </ul>
+</nav>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= it.title %></title>
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/styles/theme.css">
+    <% (it.styles ?? []).forEach((style) => { %>
+    <link rel="stylesheet" href="<%= style %>">
+    <% }) %>
+</head>
+<body class="app-body">
+    <div class="app-shell">
+        <%~ include("/components/menu/view", { items: it.items, active: it.active }) %>
+        <main class="app-content">
+            <%~ it.body %>
+        </main>
+    </div>
+</body>
+</html>

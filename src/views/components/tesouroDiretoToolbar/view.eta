@@ -1,0 +1,54 @@
+<form class="venture-toolbar" method="get" action="/tesouro-direto" role="search" aria-label="Filtros e ações da tabela">
+    <div class="venture-toolbar__filters">
+        <label class="venture-toolbar__field" for="venture-toolbar-search">
+            <span class="visually-hidden">Nome do investimento</span>
+            <input id="venture-toolbar-search" class="form-control form-control-sm venture-toolbar__search" type="search" name="search" value="<%= it.state.search %>" placeholder="Buscar investimento">
+        </label>
+        <label class="venture-toolbar__field" for="venture-toolbar-indexer">
+            <span class="visually-hidden">Indexador</span>
+            <select id="venture-toolbar-indexer" class="form-select form-select-sm venture-toolbar__select" name="indexer">
+                <option value="">Todos os indexadores</option>
+                <% it.indexerOptions.forEach((option) => { %>
+                <option value="<%= option.value %>"<% if (option.value === it.state.indexer) { %> selected<% } %>><%= option.label %></option>
+                <% }) %>
+            </select>
+        </label>
+        <button type="submit" class="venture-toolbar__button venture-toolbar__button--primary">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <span>Filtrar</span>
+        </button>
+    </div>
+    <% if (it.state.sort !== "expires") { %>
+    <input type="hidden" name="sort" value="<%= it.state.sort %>">
+    <% } %>
+    <% const defaultDirection = it.state.sort === "expires" ? "asc" : "desc"; %>
+    <% if (it.state.dir !== defaultDirection) { %>
+    <input type="hidden" name="dir" value="<%= it.state.dir %>">
+    <% } %>
+    <div class="venture-toolbar__sort">
+        <a class="venture-toolbar__button<% if (it.state.sort === "amount") { %> venture-toolbar__button--active<% } %>" href="<%= it.links.amountHref %>"<% if (it.state.sort === "amount") { %> aria-current="true"<% } %>>
+            <i class="bi <%= it.state.sort === "amount" ? (it.state.dir === "desc" ? "bi-sort-down" : "bi-sort-up") : "bi-arrow-down-up" %>" aria-hidden="true"></i>
+            <span>Montante</span>
+        </a>
+        <a class="venture-toolbar__button<% if (it.state.sort === "expires") { %> venture-toolbar__button--active<% } %>" href="<%= it.links.expiresHref %>"<% if (it.state.sort === "expires") { %> aria-current="true"<% } %>>
+            <i class="bi <%= it.state.sort === "expires" ? (it.state.dir === "asc" ? "bi-sort-down" : "bi-sort-up") : "bi-arrow-down-up" %>" aria-hidden="true"></i>
+            <span>Expiração</span>
+        </a>
+    </div>
+    <div class="venture-toolbar__actions">
+        <% if (it.hasActiveFilters) { %>
+        <a class="venture-toolbar__button" href="<%= it.links.clearHref %>">
+            <i class="bi bi-x-circle" aria-hidden="true"></i>
+            <span>Limpar filtros</span>
+        </a>
+        <% } %>
+        <button type="button" class="venture-toolbar__button">
+            <i class="bi bi-download" aria-hidden="true"></i>
+            <span>Exportar</span>
+        </button>
+        <button type="button" class="venture-toolbar__button">
+            <i class="bi bi-upload" aria-hidden="true"></i>
+            <span>Importar</span>
+        </button>
+    </div>
+</form>

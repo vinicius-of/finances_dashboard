@@ -1,0 +1,24 @@
+.register-snapshot__venture {
+  margin-bottom: 1rem;
+  color: var(--app-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.register-snapshot__form .form-label {
+  color: var(--app-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.register-snapshot__form .form-control:focus,
+.register-snapshot__form .form-select:focus {
+  border-color: var(--app-primary);
+  box-shadow: 0 0 0 0.2rem rgba(44, 87, 69, 0.16);
+}
+
+.register-snapshot__form .modal-footer {
+  gap: 0.5rem;
+}

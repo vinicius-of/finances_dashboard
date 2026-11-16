@@ -1,0 +1,295 @@
+.venture-table-wrapper {
+  width: 100%;
+}
+
+.venture-table {
+  color: var(--app-black);
+}
+
+.venture-table thead th {
+  border-bottom: 2px solid var(--app-primary);
+  color: var(--app-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.venture-table tbody th,
+.venture-table tbody td {
+  border-bottom: 1px solid rgba(44, 87, 69, 0.16);
+  vertical-align: middle;
+}
+
+.venture-table__investment {
+  font-weight: 600;
+}
+
+.venture-table__name {
+  display: block;
+}
+
+.venture-table__code {
+  display: block;
+  color: var(--bs-secondary-color);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.venture-table__type {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background-color: var(--app-secondary);
+  color: var(--app-black);
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.venture-table__amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.venture-table__profitability {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.venture-table .venture-table__profitability--up {
+  color: var(--app-success);
+}
+
+.venture-table .venture-table__profitability--down {
+  color: var(--app-danger);
+}
+
+.venture-table .venture-table__profitability--neutral {
+  color: var(--bs-secondary-color);
+}
+
+.venture-table__expiration {
+  white-space: nowrap;
+}
+
+.venture-table__empty {
+  padding: 2rem 1rem;
+  color: var(--bs-secondary-color);
+  text-align: center;
+}
+
+.venture-table__menu {
+  position: relative;
+  display: inline-block;
+}
+
+.venture-table__menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(44, 87, 69, 0.24);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: var(--app-primary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.venture-table__menu-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.venture-table__menu-trigger::marker {
+  content: "";
+}
+
+.venture-table__menu-trigger:hover {
+  background-color: rgba(44, 87, 69, 0.08);
+}
+
+.venture-table__menu-trigger:focus-visible {
+  outline: 2px solid var(--app-tertiary);
+  outline-offset: 2px;
+}
+
+.venture-table__menu[open] .venture-table__menu-trigger {
+  background-color: var(--app-secondary);
+  color: var(--app-black);
+}
+
+.venture-table__menu-list {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 10;
+  min-width: 10rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(44, 87, 69, 0.16);
+  border-radius: 0.5rem;
+  background-color: var(--app-white);
+  box-shadow: 0 0.5rem 1.5rem rgba(46, 41, 16, 0.16);
+}
+
+.venture-table__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: var(--app-black);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.venture-table__menu-item:hover {
+  background-color: rgba(235, 227, 167, 0.6);
+}
+
+.venture-table__menu-item:focus-visible {
+  outline: 2px solid var(--app-tertiary);
+  outline-offset: -2px;
+}
+
+@media (max-width: 992px) {
+  .venture-table-wrapper {
+    overflow-x: auto;
+  }
+}
+
+.venture-table .venture-table__expand-header,
+.venture-table .venture-table__expand-cell {
+  width: 1.25rem;
+  padding-right: 0;
+  padding-left: 0;
+  text-align: left;
+}
+
+.venture-table .venture-table__expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--app-primary);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.venture-table__expand .bi {
+  transition: transform 0.15s ease;
+}
+
+.venture-table__expand[aria-expanded="true"] .bi {
+  transform: rotate(180deg);
+}
+
+.venture-table__expand:focus-visible {
+  outline: 2px solid var(--app-tertiary);
+  outline-offset: 2px;
+}
+
+.venture-table__expand:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.venture-table__records-row > td {
+  background-color: rgba(44, 87, 69, 0.04);
+}
+
+.venture-table .venture-table__records-cell {
+  padding-left: 1.5rem;
+  border-left: 3px solid var(--app-primary);
+}
+
+.venture-table__records {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  text-align: left;
+}
+
+.venture-table__record {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid rgba(44, 87, 69, 0.25);
+  text-align: left;
+}
+
+.venture-table__record:first-child {
+  padding-top: 0;
+}
+
+.venture-table__record:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.venture-table__record-date {
+  min-width: 5.5rem;
+  color: var(--bs-secondary-color);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.venture-table__record-difference {
+  min-width: 7rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.venture-table__record-difference--up {
+  color: var(--app-success);
+}
+
+.venture-table__record-difference--down {
+  color: var(--app-danger);
+}
+
+.venture-table__record-difference--neutral {
+  color: var(--bs-secondary-color);
+}
+
+.venture-table__record-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.venture-table__record-balance-arrow {
+  color: var(--bs-secondary-color);
+}
+
+.venture-table__record-notes {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--bs-secondary-color);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.venture-table__records-empty {
+  color: var(--bs-secondary-color);
+  text-align: left;
+}

@@ -1,0 +1,24 @@
+.app-body {
+  min-height: 100vh;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 16px;
+}
+
+.app-content__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 24px;
+  color: var(--view-accent, var(--app-primary));
+}

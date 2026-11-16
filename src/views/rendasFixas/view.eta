@@ -1,0 +1,7 @@
+<% layout("/layout/view", { title: it.title, icon: it.icon, active: it.active, items: it.items, styles: it.styles }) %>
+<section class="view view--rendas-fixas">
+    <h2 class="app-content__title">
+        <i class="bi <%= it.icon %>" aria-hidden="true"></i>
+        <span><%= it.title %></span>
+    </h2>
+</section>

@@ -1,0 +1,42 @@
+<div class="modal fade" id="registerSnapshotModal" tabindex="-1" aria-labelledby="registerSnapshotModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form class="register-snapshot__form" novalidate>
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="registerSnapshotModalTitle">Registrar</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="ventureId" value="">
+                    <p class="register-snapshot__venture" id="registerSnapshotVenture"></p>
+                    <div class="mb-3">
+                        <label class="form-label" for="registerSnapshotType">Tipo de registro</label>
+                        <select class="form-select" id="registerSnapshotType" name="type" required>
+                            <option value="MONTHLY_RECORD" selected>Rendimento mensal</option>
+                            <option value="CONTRIBUTION">Aporte</option>
+                            <option value="WITHDRAWAL">Resgate</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="registerSnapshotValue">Valor (R$)</label>
+                        <input class="form-control" id="registerSnapshotValue" name="value" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="registerSnapshotDate">Data de aplicação</label>
+                        <input class="form-control" id="registerSnapshotDate" name="referenceDate" type="date" required>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label" for="registerSnapshotNotes">Nota</label>
+                        <textarea class="form-control" id="registerSnapshotNotes" name="notes" rows="3" maxlength="280" placeholder="Observações do registro (opcional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-outline-primary" data-action="register">Registrar</button>
+                    <button type="submit" class="btn btn-primary" data-action="register-next">Registrar e próximo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script defer src="/views/components/registerSnapshotModal/modal.js"></script>

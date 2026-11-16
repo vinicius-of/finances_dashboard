@@ -1,0 +1,17 @@
+<% layout("/layout/view", { title: it.title, icon: it.icon, active: it.active, items: it.items, styles: it.styles }) %>
+<script defer src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<section class="view view--tesouro-direto">
+    <h2 class="app-content__title">
+        <i class="bi <%= it.icon %>" aria-hidden="true"></i>
+        <span><%= it.title %></span>
+    </h2>
+    <% if (it.toolbar) { %>
+    <%~ include("/components/tesouroDiretoToolbar/view", it.toolbar) %>
+    <% } %>
+    <% if (it.ventureModal) { %>
+    <%~ include("/components/newVentureModal/view", it.ventureModal) %>
+    <% } %>
+    <%~ include("/components/tesouroDiretoTable/view", { rows: it.rows ?? [], emptyMessage: it.emptyMessage }) %>
+    <%~ include("/components/toast/view", {}) %>
+    <%~ include("/components/registerSnapshotModal/view", {}) %>
+</section>

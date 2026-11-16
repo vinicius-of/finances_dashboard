@@ -1,0 +1,104 @@
+<% const rows = it.rows ?? []; %>
+<div class="venture-table-wrapper">
+    <table class="table venture-table align-middle mb-0">
+        <caption class="visually-hidden">Investimentos do Tesouro Direto</caption>
+        <thead>
+            <tr>
+                <th scope="col" class="venture-table__expand-header"><span class="visually-hidden">Registros</span></th>
+                <th scope="col">Investimento</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Indexador</th>
+                <th scope="col" class="text-end">Montante</th>
+                <th scope="col" class="text-end">Expiração</th>
+                <th scope="col" >Rentabilidade</th>
+                <th scope="col" class="text-end">Opções</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (rows.length === 0) { %>
+            <tr>
+                <td colspan="8" class="venture-table__empty"><%= it.emptyMessage ?? "Nenhum investimento cadastrado." %></td>
+            </tr>
+            <% } %>
+            <% rows.forEach((row) => { %>
+            <tr data-venture-id="<%= row.id %>" data-venture-name="<%= row.name %>">
+                <td class="venture-table__expand-cell">
+                    <button type="button" class="venture-table__expand" aria-expanded="false" aria-controls="records-<%= row.id %>" aria-label="Registros de <%= row.name %>"<% if (row.records.length === 0) { %> disabled<% } %>>
+                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                    </button>
+                </td>
+                <th scope="row" class="venture-table__investment">
+                    <span class="venture-table__name"><%= row.name %></span>
+                    <% if (row.internalCode) { %>
+                    <span class="venture-table__code"><%= row.internalCode %></span>
+                    <% } %>
+                </th>
+                <td><span class="venture-table__type"><%= row.typeLabel %></span></td>
+                <td class="venture-table__indexer"><%= row.indexerLabel %></td>
+                <td class="text-end venture-table__amount"><%= row.amountLabel %></td>
+                <td class="text-end venture-table__expiration"><%= row.expiresAtLabel %></td>
+                <td class="venture-table__profitability venture-table__profitability--<%= row.profitabilityTrend %>"><%= row.profitabilityLabel %></td>
+                <td class="text-end venture-table__actions">
+                    <details class="venture-table__menu">
+                        <summary class="venture-table__menu-trigger" aria-label="Opções de <%= row.name %>">
+                            <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                        </summary>
+                        <ul class="venture-table__menu-list list-unstyled mb-0">
+                            <li>
+                                <button type="button" class="venture-table__menu-item" data-register-venture="<%= row.id %>" data-venture-name="<%= row.name %>">
+                                    <i class="bi bi-piggy-bank" aria-hidden="true"></i>
+                                    <span>Registrar</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="venture-table__menu-item">
+                                    <i class="bi bi-cash-stack" aria-hidden="true"></i>
+                                    <span>Sacar</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="venture-table__menu-item">
+                                    <i class="bi bi-archive" aria-hidden="true"></i>
+                                    <span>Arquivar</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="venture-table__menu-item">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                                    <span>Editar</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </details>
+                </td>
+            </tr>
+            <tr class="venture-table__records-row" id="records-<%= row.id %>" hidden>
+                <td colspan="8" class="venture-table__records-cell">
+                    <% if (row.records.length === 0) { %>
+                    <p class="venture-table__records-empty mb-0">Nenhum registro.</p>
+                    <% } else { %>
+                    <ul class="venture-table__records list-unstyled mb-0">
+                        <% row.records.forEach((record) => { %>
+                        <li class="venture-table__record">
+                            <span class="venture-table__record-date"><%= record.dateLabel %></span>
+                            <span class="venture-table__record-difference venture-table__record-difference--<%= record.differenceTrend %>"><%= record.differenceLabel %></span>
+                            <span class="venture-table__record-balance">
+                                <span class="visually-hidden">Anterior</span>
+                                <span><%= record.previousValueLabel %></span>
+                                <span class="venture-table__record-balance-arrow" aria-hidden="true">→</span>
+                                <span class="visually-hidden">Novo</span>
+                                <span><%= record.currentValueLabel %></span>
+                            </span>
+                            <span class="venture-table__record-notes"<% if (record.notes) { %> title="<%= record.notes %>"<% } %>><%= record.notes || "—" %></span>
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } %>
+                </td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+<script defer src="/views/components/tesouroDiretoTable/menu.js"></script>
+<script defer src="/views/components/tesouroDiretoTable/records.js"></script>

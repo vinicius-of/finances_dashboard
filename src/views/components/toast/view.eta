@@ -1,0 +1,2 @@
+<div class="toast-stack" id="toastStack" aria-live="polite"></div>
+<script defer src="/views/components/toast/toast.js"></script>

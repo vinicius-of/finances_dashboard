@@ -1,0 +1,42 @@
+.app-sidebar {
+    width: 200px;
+    flex: 0 0 200px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    background-color: var(--app-primary);
+}
+
+.app-menu {
+    padding: 0;
+}
+
+.app-menu__link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: var(--app-white);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.app-menu__link:hover:not(.app-menu__link--active) {
+    background-color: rgba(235, 125, 0, 0.22);
+}
+
+.app-menu__link:focus-visible {
+    outline: 2px solid var(--app-tertiary);
+    outline-offset: -2px;
+}
+
+.app-menu__link--active {
+    background-color: var(--app-secondary);
+    color: var(--app-black);
+    font-weight: 600;
+}
+
+.app-menu__link--active .bi {
+    color: var(--app-black);
+}

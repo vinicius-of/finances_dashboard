@@ -1,0 +1,80 @@
+.venture-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.venture-toolbar__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.venture-toolbar__field {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.venture-toolbar__search {
+  min-width: 14rem;
+}
+
+.venture-toolbar__select {
+  min-width: 9rem;
+}
+
+.venture-toolbar__sort {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.venture-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: auto;
+}
+
+.venture-toolbar__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid rgba(44, 87, 69, 0.24);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: var(--app-primary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.venture-toolbar__button:hover {
+  background-color: rgba(44, 87, 69, 0.08);
+  color: var(--app-primary);
+}
+
+.venture-toolbar__button:focus-visible {
+  outline: 2px solid var(--app-tertiary);
+  outline-offset: 2px;
+}
+
+.venture-toolbar__button--primary,
+.venture-toolbar__button--active {
+  border-color: var(--app-primary);
+  background-color: var(--app-primary);
+  color: var(--app-white);
+}
+
+.venture-toolbar__button--primary:hover,
+.venture-toolbar__button--active:hover {
+  background-color: #1f3d30;
+  color: var(--app-white);
+}

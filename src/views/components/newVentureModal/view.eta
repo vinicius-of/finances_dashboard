@@ -1,0 +1,83 @@
+<div class="venture-create">
+    <button type="button" class="btn btn-outline-success venture-create__button" data-new-venture>
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        <span>Novo investimento</span>
+    </button>
+</div>
+<div class="modal fade" id="newVentureModal" tabindex="-1" aria-labelledby="newVentureModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form class="new-venture__form" novalidate>
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="newVentureModalTitle"><%= it.title %></h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label" for="newVentureName">Nome</label>
+                            <input class="form-control" id="newVentureName" name="name" type="text" maxlength="120" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="newVentureInternalCode">Código interno</label>
+                            <input class="form-control" id="newVentureInternalCode" name="internalCode" type="text" maxlength="32" placeholder="Opcional">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="newVentureType">Tipo</label>
+                            <select class="form-select" id="newVentureType" name="type" required>
+                                <% it.types.forEach((type) => { %>
+                                <option value="<%= type.value %>" data-category="<%= type.category %>"><%= type.label %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="newVentureBoughtAt">Data de compra</label>
+                            <input class="form-control" id="newVentureBoughtAt" name="boughtAt" type="date" required>
+                        </div>
+                        <div class="col-md-4" data-category-section="FIXED">
+                            <label class="form-label" for="newVentureExpiresIn">Vencimento</label>
+                            <input class="form-control" id="newVentureExpiresIn" name="expiresIn" type="date" data-required="true">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-0" data-category-section="FIXED">
+                        <div class="col-md-3">
+                            <label class="form-label" for="newVentureInitialValue">Valor inicial (R$)</label>
+                            <input class="form-control" id="newVentureInitialValue" name="initialValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" data-required="true">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="newVentureIndexer">Indexador</label>
+                            <select class="form-select" id="newVentureIndexer" name="indexer" data-required="true">
+                                <% it.indexers.forEach((indexer) => { %>
+                                <option value="<%= indexer.value %>"><%= indexer.label %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="newVentureRate">Taxa (% a.a.)</label>
+                            <input class="form-control" id="newVentureRate" name="rate" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" data-required="true">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="newVentureSource">Fonte</label>
+                            <input class="form-control" id="newVentureSource" name="source" type="text" maxlength="120" placeholder="Ex.: Tesouro Direto" data-required="true">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-0" data-category-section="VARIABLE" hidden>
+                        <div class="col-md-4">
+                            <label class="form-label" for="newVentureQuantity">Quantidade</label>
+                            <input class="form-control" id="newVentureQuantity" name="quantity" type="number" min="0.00000001" step="any" inputmode="decimal" placeholder="0" data-required="true">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="newVentureUnitPrice">Preço unitário (R$)</label>
+                            <input class="form-control" id="newVentureUnitPrice" name="unitPrice" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" data-required="true">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success" data-action="create">Criar investimento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script defer src="/views/components/newVentureModal/modal.js"></script>

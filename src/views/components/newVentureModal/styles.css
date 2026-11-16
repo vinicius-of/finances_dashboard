@@ -1,0 +1,16 @@
+.venture-create {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+}
+
+.venture-create__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 600;
+}
+
+.new-venture__form [data-category-section][hidden] {
+  display: none !important;
+}
