@@ -57,12 +57,13 @@ Representa os **objetos reais** do domínio como tipos e interfaces TypeScript p
 
 Contém toda a estrutura de dados persistidos, modelada com **Drizzle ORM** sobre `bun:sqlite`.
 
-| Item          | Responsabilidade                                                  |
-| ------------- | ----------------------------------------------------------------- |
-| `models/`     | Definição dos schemas/tabelas do banco (Drizzle)                  |
-| `migrations/` | Migrações geradas e versionadas do schema                         |
-| `seeds/`      | Scripts de população inicial do banco (dados de teste/referência) |
-| `index.ts`    | Ponto de exportação da camada de banco (re-exporta `models/`)     |
+| Item          | Responsabilidade                                                                             |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| `models/`     | Definição dos schemas/tabelas do banco (Drizzle)                                             |
+| `migrations/` | Migrações geradas e versionadas do schema                                                    |
+| `seeds/`      | Scripts de população inicial do banco (dados de teste/referência)                            |
+| `backup.ts`   | Backup consistente do banco (checkpoint WAL + `VACUUM INTO`); destino opcional via argumento |
+| `index.ts`    | Ponto de exportação da camada de banco (re-exporta `models/`)                                |
 
 ---
 
@@ -78,10 +79,32 @@ Estrutura em camadas para tratamento de requisições HTTP:
 | -------------- | ------------------------------------------------------------------------ |
 | `guards/`      | Proteção/validação de acesso a rotas ou recursos                         |
 | `middlewares/` | Processamento intermediário de requisições (autenticação, logging, etc.) |
-| `controllers/` | Handlers das rotas (recepção da requisição e montagem da resposta)       |
-| `services/`    | Regras de negócio e orquestração de dados                                |
+| `controllers/` | Handlers de recursos sem visualização (API)                              |
+| `services/`    | Serviços de domínio (ventures, snapshots e export)                       |
 
-> Obs.: atualmente é um scaffold (diretórios vazios) aguardando implementação.
+> Obs.: `controllers/` já possui `SnapshotsController` (`POST /api/snapshots`); `guards/` e `middlewares/` permanecem scaffold aguardando implementação. Os serviços de domínio vivem em `src/api/services/` e a renderização SSR fica em `src/views/views.controller.ts`.
+
+### `src/api/services/` — Serviços de domínio
+
+Serviços de orquestração para operações sem visualização, implementando `IService<TInput, TOutput>` (`execute`) e dependendo de _ports_ injetados no construtor.
+
+| Arquivo/Diretório   | Responsabilidade                                                                                                                                                                                      |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `services.types.ts` | Contrato geral `IService<TInput, TOutput>`.                                                                                                                                                           |
+| `mappers.ts`        | Conversões `Date` ↔ string (`YYYY-MM-DD`/ISO) e centavos → reais.                                                                                                                                     |
+| `ventures/`         | `VenturesService` (validação + CRUD), `validateVentures.ts`, `ventures.types.ts` e `ventures.test.ts`.                                                                                                |
+| `snapshots/`        | `SnapshotsService` (`save`, `update`, `softDelete`, `get`, `getAll`, `tracking`), mappers (`snapshots.mappers.ts`), utilidades (`snapshots.utils.ts`), erros (`snapshots.errors.ts`), tipos e testes. |
+| `export/`           | `ExportService` (download JSON com ventures/snapshots/tracking/summary), tipos e testes.                                                                                                              |
+| `portfolio/`        | `PortfolioService` (`listTracking({ type })`), tipos e testes com fakes.                                                                                                                              |
+| `index.ts`          | Barrel dos tipos e serviços.                                                                                                                                                                          |
+
+**Regras**:
+
+- Arquivos de controller e service permanecem enxutos: funções auxiliares e validadores em `<modulo>.utils.ts`, mappers de conversão entre camadas em `<modulo>.mappers.ts` e funções que retornam `ApiError` em `<modulo>.errors.ts` (todos no mesmo diretório).
+- Interfaces de serviço em **centavos** e `Date`; a conversão para o banco ocorre na borda com os repositórios.
+- Erros de negócio usam `ApiError` com `400` (entrada), `404` (inexistente) e `422` (regra).
+- Testes usam fakes em memória dos _ports_, sem banco.
+- O serviço `import/` permanece fora do escopo atual.
 
 ### `src/configs/` — Configurações
 
@@ -124,17 +147,38 @@ Funções auxiliares reutilizáveis:
 - `formatDate.ts` — formatação de datas.
 - `formatMoneyToBRL.ts` — formatação de valores monetários em Real (BRL).
 - `formatMoneyToUSD.ts` — formatação de valores monetários em Dólar (USD).
+- `logs.ts` — logging estruturado de startup/requisições (`log`, `withRequestLog`).
+- `staticAssets.ts` — configuração das rotas de assets estáticos (`staticAssetRoutes`).
 
-### `src/views/` — Templates ETA
+### `src/views/` — Templates ETA, estilos e configuração por view
 
-Templates das páginas renderizadas no servidor (SSR):
+Cada view vive em seu próprio diretório com `view.eta`, `styles.css` e `index.ts` (configuração exportada diretamente pelo diretório):
 
-| Arquivo         | Finalidade                      |
-| --------------- | ------------------------------- |
-| `index.eta`     | Página inicial                  |
-| `error.403.eta` | Página de erro — acesso negado  |
-| `error.404.eta` | Página de erro — não encontrado |
-| `error.500.eta` | Página de erro — falha interna  |
+| Diretório/Arquivo                  | Finalidade                                                                                                                    |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `layout/`                          | Shell compartilhado (`view.eta`, `styles.css`, `index.ts`)                                                                    |
+| `components/menu/`                 | Menu lateral (`view.eta`, `styles.css`, `index.ts`)                                                                           |
+| `components/tesouroDiretoTable/`   | Tabela de investimentos do Tesouro Direto (`view.eta`, `styles.css`, `index.ts` + mapper)                                     |
+| `components/tesouroDiretoToolbar/` | Barra de filtros, ordenação e ações do Tesouro Direto (`view.eta`, `styles.css`, `index.ts`, `state.ts` + testes)             |
+| `tesouroDireto/`                   | Página Tesouro Direto (`view.eta`, `styles.css`, `index.ts`)                                                                  |
+| `rendasFixas/`                     | Página Rendas Fixas (`view.eta`, `styles.css`, `index.ts`)                                                                    |
+| `acoes/`                           | Página Ações (`view.eta`, `styles.css`, `index.ts`)                                                                           |
+| `types.ts`                         | Contratos de configuração das views (`IViewConfig`, `IPageViewConfig`, `NavItem`) e tipos de linha (`ITesouroDiretoTableRow`) |
+| `index.ts`                         | Barrel das views/configurações                                                                                                |
+| `views.controller.ts`              | Controller SSR (`ViewsController`, `NAV_ITEMS`, `NavKey`)                                                                     |
+| `views.test.ts`                    | Testes do controller de views                                                                                                 |
+| `errorViews/`                      | Templates de erro (`error.403.eta`, `error.404.eta`, `error.500.eta`)                                                         |
+
+**Regras**:
+
+- Cada diretório exporta sua configuração pelo `index.ts`: `template`, `style` e `stylePath`; as páginas também exportam `key`, `label`, `href` e `icon`.
+- As páginas chamam `layout("/layout/view", { ..., styles: it.styles })`; o layout inclui `/components/menu/view` e carrega os `styles.css` no `<head>`.
+- O menu usa `app-menu__link--active` e `aria-current="page"` no item correspondente; os estilos de layout, menu e view ficam em `src/views/*/styles.css`.
+- Componentes de view seguem o mesmo padrão (`view.eta`, `styles.css`, `index.ts`) e seu CSS precisa ser registrado em `src/utils/staticAssets.ts` (array `viewStyles`).
+- A tabela do Tesouro Direto consome `ITesouroDiretoTableRow` (strings de apresentação) via `toTesouroDiretoTableRow(IVentureTracking)`; o menu de ações usa `<details>`/`<summary>` e um script dedicado (`tesouroDiretoTable/menu.js`) que o fecha ao sair do foco, ao clicar fora e com `Esc`. A primeira coluna expande os registros (snapshots) via `records.js` (`aria-expanded` + `hidden`), exibindo data, diferença de saldo (`+ R$ …`, `- R$ …`, `R$ 0,00`), valores anterior → novo e nota com clamp de 3 linhas.
+- `tesouroDireto/ventures.ts` centraliza `EMPTY_VALUE`, os rótulos de `VentureType`/`IndexerType` e o guard `isFixedIncomeVenture`, usados pela tabela e pela toolbar.
+- A toolbar do Tesouro Direto aplica filtros e ordenação **no servidor** via query string (`search`, `indexer`, `sort`, `dir`), sem JavaScript; `state.ts` concentra parse, filtro, ordenação e links canônicos. Exportar/Importar são botões inertes.
+- A página do Tesouro Direto renderiza dados reais: `ViewsController(eta, portfolio)` recebe um `IPortfolioTrackingReader` e consulta `listTracking({ type: TREASURY })`; o wiring (`index.ts`) liga repositórios → `VenturesService`/`SnapshotsService` → `PortfolioService`.
 
 ---
 
@@ -142,9 +186,13 @@ Templates das páginas renderizadas no servidor (SSR):
 
 Arquivos e utilitários concretos que servem como base para o funcionamento da aplicação **sem exigir importações que precisem de mudanças**:
 
-| Arquivo      | Responsabilidade                                                  |
-| ------------ | ----------------------------------------------------------------- |
-| `root.ts`    | Constantes de caminhos raiz (`PROJECT_ROOT`, `ENV_PATH`)          |
-| `favicon.ts` | `FavIconConfigs` — localização e servimento do favicon            |
-| `headers.ts` | Headers padrão de respostas (`PageHeadersInit`, `ApiHeadersInit`) |
-| `index.ts`   | Re-exportação dos módulos acima                                   |
+| Arquivo            | Responsabilidade                                                          |
+| ------------------ | ------------------------------------------------------------------------- |
+| `root.ts`          | Constantes de caminhos raiz (`PROJECT_ROOT`, `ENV_PATH`)                  |
+| `favicon.ts`       | `FavIconConfigs` — localização e servimento do favicon                    |
+| `headers.ts`       | Headers padrão de respostas (`PageHeadersInit`, `ApiHeadersInit`)         |
+| `files.ts`         | `fileResponse` — resposta de arquivos com 404/`Last-Modified`/304         |
+| `styles/theme.css` | Paleta do projeto e estilos do shell/menu/conteúdo (Bootstrap + CSS vars) |
+| `index.ts`         | Re-exportação dos módulos acima                                           |
+
+**Rotas do `index.ts`**: `/` (redirect para `/tesouro-direto`), `/tesouro-direto`, `/rendas-fixas`, `/acoes` (SSR), `/api/health` (JSON de exemplo) e assets estáticos.

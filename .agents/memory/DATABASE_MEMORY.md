@@ -18,6 +18,7 @@ ID nova: siga a sequência global do `INDEX.md` (formato `MEM-<AAAA>-<NNN>`).
 | 7   | MEM-2026-016 | Migrações: config, formato e comandos                          | Processo  | Ativa  | 2026-09-24    |
 | 8   | MEM-2026-017 | Agregados não persistidos (summary/tracking calculados)        | Decisão   | Ativa  | 2026-09-24    |
 | 9   | MEM-2026-018 | Bridge de banco para `src/` (`src/configs/database`)           | Fato      | Ativa  | 2026-09-25    |
+| 10  | MEM-2026-030 | Carga inicial de ventures e snapshots via migration de dados   | Fato      | Ativa  | 2026-11-11    |
 
 ---
 
@@ -266,3 +267,32 @@ Fluxo de migrações do projeto (geração, formato dos arquivos e comandos).
 
 - `src/configs/database/index.ts`
 - `#mem-2026-009`, `#mem-2026-010`, `#mem-2026-012`, `#mem-2026-013`, `#mem-2026-014`, `#mem-2026-019`
+
+## MEM-2026-030 — Carga inicial de ventures e snapshots via migration de dados {#mem-2026-030}
+
+- **Tipo**: Fato
+- **Status**: Ativa
+- **Criada em**: 2026-11-11
+- **Atualizada em**: 2026-11-11
+- **Tags**: `database`, `migration`, `seed`, `import`, `tesouro`, `renda-fixa`, `acoes`
+- **Fonte**: `database/migrations/20261111204436_import-initial-data/`, `contracts/enums.ts`, `database/models/ventures.ts`
+
+### Descrição
+
+A base inicial foi carregada por uma migration **de dados** (SQL custom) sobre o schema inicial: 18 ventures (13 ações, 2 LCI, 1 CRA, 2 Tesouro) e 26 snapshots, todos com prefixo de id `imp-`.
+
+### Detalhes
+
+- Migration criada com `bunx drizzle-kit generate --custom --name=import-initial-data`; sem alteração de schema (snapshot copiado, `prevIds` encadeado).
+- `DATABASE_URL` vazio no `.env` → o client e o drizzle-kit usam `my-finances.db` (default).
+- Statements de dados precisam de `--> statement-breakpoint`; sem o marcador o migrator executa apenas o primeiro statement do arquivo.
+- `VentureType` ganhou `CRA` (contrato + `ventureTypes` do model + rótulo na view); não exige migração porque a coluna `type` é `text` sem CHECK.
+- Premissas da carga: `rate = 0` para Tesouro (taxa não informada na origem), `source = 'Não informado'` para LCI/CRA, `bought_at` das ações = data de registro (`2026-09-09`), snapshots `MONTHLY_RECORD` com `total_contributed = initial_value`.
+- `gross_profit`/`profit_percentage` foram calculados no SQL a partir de `initial_value`; o snapshot de `Tesouro Selic 2031` em `2026-07-09` (R$ 17.236,41) está fora da série e recebeu `notes` de revisão.
+- Duplicatas do arquivo de renda fixa (linhas com separadores espaçados) foram ignoradas.
+
+### Referências
+
+- `database/migrations/20261111204436_import-initial-data/migration.sql`
+- `imports/README.md`
+- `#mem-2026-012`, `#mem-2026-013`, `#mem-2026-016`
