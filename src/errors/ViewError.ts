@@ -1,11 +1,12 @@
 import { Eta } from "eta";
+import { PageHeadersInit } from "@/static";
 import { AppError } from "./AppError";
 
 export class ViewError extends AppError {
   constructor(
     statusCode: number,
     message: string,
-    public template: string = "./404",
+    public template: string = `errorViews/error.${statusCode}.eta`,
   ) {
     super(statusCode, message);
   }
@@ -13,12 +14,13 @@ export class ViewError extends AppError {
   handle(eta: Eta) {
     try {
       const html = eta.render(this.template, {
-        title: /*TODO: Adicionar i18n de retorno */ "",
+        title: `Erro ${this.statusCode}`,
         message: this.message,
       });
 
       return new Response(html, {
-        headers: /*TODO: Padronizar headers */ {},
+        status: this.statusCode,
+        headers: PageHeadersInit,
       });
     } catch {
       // Fallback caso o template dê erro de renderização
