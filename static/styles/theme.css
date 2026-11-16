@@ -1,0 +1,29 @@
+:root {
+  font-size: 12px;
+
+  --app-primary: #2c5745;
+  --app-secondary: #ebe3a7;
+  --app-tertiary: #eb7d00;
+  --app-black: #2e2910;
+  --app-white: #ffffff;
+  --app-success: #4a8c3a;
+  --app-danger: #c83e2b;
+
+  --bs-success: var(--app-success);
+  --bs-success-rgb: 74, 140, 58;
+  --bs-danger: var(--app-danger);
+  --bs-danger-rgb: 200, 62, 43;
+
+  --bs-primary: var(--app-primary);
+  --bs-primary-rgb: 44, 87, 69;
+  --bs-secondary: var(--app-secondary);
+  --bs-secondary-rgb: 235, 227, 167;
+  --bs-tertiary: var(--app-tertiary);
+  --bs-tertiary-rgb: 235, 125, 0;
+  --bs-dark: var(--app-black);
+  --bs-dark-rgb: 46, 41, 16;
+  --bs-body-color: var(--app-black);
+  --bs-body-bg: #ffffff;
+  --bs-link-color: var(--app-primary);
+  --bs-link-hover-color: #1f3d30;
+}
