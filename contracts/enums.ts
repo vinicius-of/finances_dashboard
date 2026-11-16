@@ -10,6 +10,7 @@ export const VentureType = {
   CDB: "CDB",
   LCI: "LCI",
   LCA: "LCA",
+  CRA: "CRA",
   STOCK: "STOCK",
   FII: "FII",
 } as const;

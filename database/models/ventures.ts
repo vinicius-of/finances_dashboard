@@ -27,6 +27,7 @@ const ventureTypes = [
   VentureType.CDB,
   VentureType.LCI,
   VentureType.LCA,
+  VentureType.CRA,
   VentureType.STOCK,
   VentureType.FII,
 ] as const satisfies readonly VentureType[];
