@@ -1,0 +1,8 @@
+id_interno_venture,data_referencia,valor_atual,quantidade,preco_unitario,tipo_movimento,valor_movimento,notas
+td-selic-2027,2026-01-08,21581.89,,,MONTHLY_RECORD,,
+td-selic-2027,2026-03-02,21948.21,,,MONTHLY_RECORD,,
+td-selic-2027,2026-07-09,22865.06,,,MONTHLY_RECORD,,
+td-selic-2027,2026-09-09,23411.57,,,MONTHLY_RECORD,,
+td-selic-2031,2026-03-02,1651.09,,,MONTHLY_RECORD,,
+td-selic-2031,2026-07-09,17236.41,,,MONTHLY_RECORD,revisar: valor fora da série histórica,
+td-selic-2031,2026-09-09,7612.65,,,MONTHLY_RECORD,,

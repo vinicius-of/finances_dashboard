@@ -1,0 +1,3 @@
+id_interno,nome,codigo_interno,categoria,tipo,indexador,taxa,fonte,valor_inicial,data_aplicacao,data_vencimento,quantidade,preco_unitario
+ac-petr4,Petrobras PN,PETR4,VARIABLE,STOCK,,,Corretora Exemplo,3890.00,2026-02-10,,100,38.90
+ac-hglg11,HGLG11,HGLG11,VARIABLE,FII,,,Corretora Exemplo,8260.00,2026-04-22,,50,165.20

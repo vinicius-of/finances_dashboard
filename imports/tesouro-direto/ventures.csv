@@ -1,0 +1,3 @@
+id_interno,nome,codigo_interno,categoria,tipo,indexador,taxa,fonte,valor_inicial,data_aplicacao,data_vencimento,quantidade,preco_unitario
+td-selic-2027,Tesouro Selic 2027,,FIXED,TREASURY,SELIC,0.1105,Tesouro Direto,10050.02,2026-01-05,2028-03-01,,
+td-selic-2031,Tesouro Selic 2031,,FIXED,TREASURY,SELIC,0.1105,Tesouro Direto,1642.09,2026-02-05,2031-03-01,,

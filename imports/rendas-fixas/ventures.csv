@@ -1,0 +1,4 @@
+id_interno,nome,codigo_interno,categoria,tipo,indexador,taxa,fonte,valor_inicial,data_aplicacao,data_vencimento,quantidade,preco_unitario
+rf-cdb-2028,CDB Banco Exemplo 2028,,FIXED,CDB,CDI,1.05,Banco Exemplo,5000.00,2025-11-10,2028-11-10,,
+rf-lci-2027,LCI Banco Exemplo 2027,,FIXED,LCI,CDI,0.92,Banco Exemplo,8000.00,2026-03-15,2027-09-15,,
+rf-lca-2029,LCA Banco Exemplo 2029,,FIXED,LCA,IPCA,0.055,Banco Exemplo,3000.00,2026-06-01,2029-06-01,,
