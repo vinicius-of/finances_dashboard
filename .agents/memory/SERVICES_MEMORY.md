@@ -7,13 +7,13 @@ ID nova: siga a sequência global do `INDEX.md` (formato `MEM-<AAAA>-<NNN>`).
 
 ## Índice de Consulta
 
-| #   | ID           | Memória                                                    | Tipo     | Status | Atualizada em |
-| --- | ------------ | ---------------------------------------------------------- | -------- | ------ | ------------- |
-| 1   | MEM-2026-026 | Contrato da camada de serviços (`src/api/services`)        | Contrato | Ativa  | 2026-10-23    |
-| 2   | MEM-2026-027 | Testes antes da implementação e reuso entre serviços       | Decisão  | Ativa  | 2026-10-23    |
-| 3   | MEM-2026-031 | `PortfolioService` e rendering do Tesouro com dados reais  | Decisão  | Ativa  | 2026-11-12    |
-| 4   | MEM-2026-033 | Controller HTTP `POST /api/snapshots` e aporte no montante | Contrato | Ativa  | 2026-11-13    |
-| 5   | MEM-2026-035 | Controller `POST /api/ventures` e criação normalizada      | Contrato | Ativa  | 2026-11-16    |
+| #   | ID           | Memória                                                   | Tipo     | Status | Atualizada em |
+| --- | ------------ | --------------------------------------------------------- | -------- | ------ | ------------- |
+| 1   | MEM-2026-026 | Contrato da camada de serviços (`src/api/services`)       | Contrato | Ativa  | 2026-10-23    |
+| 2   | MEM-2026-027 | Testes antes da implementação e reuso entre serviços      | Decisão  | Ativa  | 2026-10-23    |
+| 3   | MEM-2026-031 | `PortfolioService` e rendering do Tesouro com dados reais | Decisão  | Ativa  | 2026-11-12    |
+| 4   | MEM-2026-033 | Controller HTTP de snapshots (POST, PATCH, DELETE)        | Contrato | Ativa  | 2026-11-18    |
+| 5   | MEM-2026-035 | Controller `POST /api/ventures` e criação normalizada     | Contrato | Ativa  | 2026-11-16    |
 
 ## MEM-2026-026 — Contrato da camada de serviços (`src/api/services`) {#mem-2026-026}
 
@@ -104,18 +104,18 @@ A tabela do Tesouro Direto passou a consumir dados reais do SQLite por meio de u
 - `#mem-2026-026`, `#mem-2026-030`
 - `.agents/plans/render-tesouro-table-from-database.md`
 
-## MEM-2026-033 — Controller HTTP `POST /api/snapshots` e aporte no montante {#mem-2026-033}
+## MEM-2026-033 — Controller HTTP de snapshots (POST, PATCH, DELETE) {#mem-2026-033}
 
 - **Tipo**: Contrato
 - **Status**: Ativa
 - **Criada em**: 2026-11-13
-- **Atualizada em**: 2026-11-13
-- **Tags**: `controllers`, `api`, `snapshots`, `post`, `validacao`, `montante`
+- **Atualizada em**: 2026-11-18
+- **Tags**: `controllers`, `api`, `snapshots`, `post`, `patch`, `delete`, `soft-delete`, `validacao`, `montante`
 - **Fonte**: `src/api/controllers/{snapshots.controller.ts,snapshots.controller.types.ts,snapshots.controller.test.ts}`, `src/api/services/snapshots/snapshots.service.ts`, `index.ts`
 
 ### Descrição
 
-Criada a primeira camada de controllers HTTP do projeto: `SnapshotsController.create(req)` recebe `POST /api/snapshots`, valida o payload e delega ao `SnapshotsService`, devolvendo `201 { snapshot }`.
+Criada a primeira camada de controllers HTTP do projeto: `SnapshotsController` recebe `POST`, `PATCH` e `DELETE` em `/api/snapshots`, valida o payload e delega ao `SnapshotsService`, devolvendo `201 { snapshot }` na criação e `200 { snapshot }` na atualização/exclusão.
 
 ### Detalhes
 
@@ -125,10 +125,15 @@ Criada a primeira camada de controllers HTTP do projeto: `SnapshotsController.cr
   - Resposta: `201 { snapshot: IVentureSnapshot }` (datas em ISO). Erros usam `ApiError.handle()` → `{ error: true, statusCode, message, details }`.
   - Validações do controller (`400`, `details: { field, rule }`): `body`/`json`, `ventureId`/`required`, `type`/`enum`, `value`/`integer_positive`, `referenceDate`/`format|date`, `notes`/`max_length`.
 - Porta estreita `ISnapshotWriter { save(data: SnapshotInput): IVentureSnapshot }` — o controller recebe o `SnapshotsService` estruturalmente e é testado com stub que registra chamadas.
-- `index.ts`: `SnapshotsController` instanciado com `snapshotsService` e rota `"/api/snapshots": withRequestLog("json", ...)` antes do catch-all `/*`.
+- `PATCH /api/snapshots` (`SnapshotsController.update`): corpo `{ ventureId, snapshotId, value, referenceDate, notes? }`; `value` (centavos) atualiza `currentTotalValue`; `type`/`movementValue` são ignorados; `notes` é sempre enviado (vazio limpa a nota); resposta `200 { snapshot }`.
+- `DELETE /api/snapshots` (`SnapshotsController.remove`): corpo `{ ventureId, snapshotId }`; executa `softDelete` e responde `200 { snapshot }` (a linha permanece no banco com `deletedAt`).
+- Vínculo venture↔snapshot no domínio: `SnapshotsService.update(ventureId, id, data)` e `softDelete(ventureId, id)` chamam `requireOwned` (lê o snapshot e compara `ventureId`) **antes** de qualquer escrita; snapshot inexistente ou de outra venture → `404` sem alteração.
+- Falhas de `PATCH`/`DELETE` são registradas por `log.error` (`src/utils/logs.ts`) com método, status, ids, mensagem e detalhes, antes da resposta de erro; erros inesperados são logados e repropagados.
+- `index.ts`: rotas `PATCH` e `DELETE` no mesmo `"/api/snapshots"` (`withRequestLog("json", ...)`).
+- `ISnapshotCommands` (porta com `save`/`update`/`softDelete`) estende `ISnapshotWriter` para os testes existentes.
 - Mudança de comportamento no `SnapshotsService.save`: quando `currentTotalValue` não é informado, o fallback passa a ser `(snapshot anterior ?? initialValue) + movement`. Aporte soma e resgate subtrai o montante; `grossProfit` permanece igual. Envios explícitos de `currentTotalValue` e `MONTHLY_RECORD` ficam inalterados.
 - Erros do service preservados no HTTP: `404` venture inexistente, `422` `movementValue` ausente/≤ 0, resgate acima do aportado e valores negativos.
-- Cobertura: 13 casos em `snapshots.controller.test.ts` + 5 casos novos em `snapshots.test.ts`.
+- Cobertura: 13 casos em `snapshots.controller.test.ts` (POST) + 14 casos (PATCH/DELETE) + 5 casos novos em `snapshots.test.ts` (vínculo).
 
 ### Referências
 

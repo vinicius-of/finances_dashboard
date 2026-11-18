@@ -12,10 +12,10 @@ ID nova: siga a sequência global do `INDEX.md` (formato `MEM-<AAAA>-<NNN>`).
 | 1   | MEM-2026-021 | Shell de views SSR com ETA                    | Decisão   | Ativa  | 2026-10-23    |
 | 2   | MEM-2026-022 | Paleta e layout visual do shell               | Regra     | Ativa  | 2026-10-19    |
 | 3   | MEM-2026-024 | Contrato das configurações de view            | Interface | Ativa  | 2026-10-23    |
-| 4   | MEM-2026-028 | Tabela de investimentos do Tesouro Direto     | Interface | Ativa  | 2026-10-29    |
+| 4   | MEM-2026-028 | Tabela de investimentos do Tesouro Direto     | Interface | Ativa  | 2026-11-18    |
 | 5   | MEM-2026-029 | Toolbar e filtros da tabela do Tesouro Direto | Decisão   | Ativa  | 2026-11-08    |
 | 6   | MEM-2026-032 | Expansão de registros (snapshots) na tabela   | Interface | Ativa  | 2026-11-12    |
-| 7   | MEM-2026-034 | Modal "Registrar" e componente de toast       | Interface | Ativa  | 2026-11-13    |
+| 7   | MEM-2026-034 | Modal "Registrar" e componente de toast       | Interface | Ativa  | 2026-11-18    |
 | 8   | MEM-2026-036 | Botão e modal "Novo investimento"             | Interface | Ativa  | 2026-11-16    |
 
 ## MEM-2026-021 — Shell de views SSR com ETA (layout + partial + controller) {#mem-2026-021}
@@ -113,7 +113,7 @@ Define a paleta global e separa os estilos específicos de layout, menu e cada v
 - **Tipo**: Interface
 - **Status**: Ativa
 - **Criada em**: 2026-10-29
-- **Atualizada em**: 2026-10-29
+- **Atualizada em**: 2026-11-18
 - **Tags**: `views`, `eta`, `tabela`, `tesouro-direto`, `bootstrap`, `formatacao`
 - **Fonte**: `src/views/components/tesouroDiretoTable/`, `src/views/types.ts`, `src/views/views.controller.ts`, `src/utils/formatMoneyToBRL.ts`, `src/utils/formatDate.ts`, `src/utils/formatPercentage.ts`
 
@@ -126,7 +126,7 @@ Componente específico da página Tesouro Direto que renderiza um investimento p
 - `ITesouroDiretoTableRow` (`src/views/types.ts`): `id`, `name`, `internalCode?`, `typeLabel`, `indexerLabel`, `amountLabel`, `profitabilityLabel`, `profitabilityTrend` (`up | down | neutral`), `expiresAtLabel` — somente strings de apresentação, sem importar `contracts/`.
 - `toTesouroDiretoTableRow(tracking)` (`src/views/components/tesouroDiretoTable/index.ts`) é a única bridge `IVentureTracking` → linha: formata centavos em BRL, data em UTC e rentabilidade com sinal; usa `—` quando não há snapshot, `expiresIn` ou `indexer` (ativo variável).
 - Colunas: Investimento, Tipo, Indexador, Montante, Rentabilidade, Expiração, Opções. `VentureType` → rótulo PT-BR; `IndexerType` → rótulo ("Selic", "Prefixado", "Fixo"…).
-- Menu de ações em `<details>`/`<summary>` com Guardar, Sacar, Arquivar e Editar inertes; no cliente, `menu.js` fecha o menu ao sair do foco (`focusout`), ao clicar fora e com `Esc`. O layout segue sem carregar scripts — o próprio componente inclui o seu.
+- Menu de ações em `<details>`/`<summary>` com Registrar, Arquivar e Editar: `Registrar` abre o modal de registro (`data-register-venture`/`data-venture-name`); `Arquivar` e `Editar` seguem inertes. Não existe ação `Sacar` — resgates são registrados pelo tipo "Resgate" (`WITHDRAWAL`) no próprio modal. No cliente, `menu.js` fecha o menu ao sair do foco (`focusout`), ao clicar fora e com `Esc`. O layout segue sem carregar scripts — o próprio componente inclui o seu.
 - CSS em `src/views/components/tesouroDiretoTable/styles.css`, registrado em `viewStyles` (`src/utils/staticAssets.ts`) e carregado apenas na página do Tesouro via `extraStyles` do `ViewsController.render`.
 - `ViewsController.render(page, { rows?, extraStyles? })` injeta `rows` em todas as páginas; hoje `index()` usa `PREVIEW_TRACKING` (mock) + mapper.
 - Formatadores: `formatMoneyToBRL` (centavos → BRL, NBSP normalizado), `formatDate` (UTC, `RangeError` em data inválida) e `formatPercentage` (`signDisplay: exceptZero`).
@@ -196,6 +196,7 @@ A tabela do Tesouro Direto ganhou uma primeira coluna (cabeçalho sem texto vis�
 - `records.js` (idempotente) alterna `aria-expanded`, classe `--open` e `hidden` da linha controlada; botão fica `disabled` sem registros (lista mostra “Nenhum registro.”).
 - A célula da lista de registros tem recuo à esquerda (`padding-left: 1.5rem`) e borda esquerda destacada (`3px solid var(--app-primary)`) para indicar o investimento de origem.
 - Nota exibida com `line-clamp: 3` e `title` com o texto completo; ausente → `—`.
+- Cada registro carrega dados crus para as ações (`id`, `ventureId`, `type`, `value` em centavos, `referenceDate` em `YYYY-MM-DD` e `notes`) e renderiza, depois da nota, dois botões outline “Editar”/“Excluir” (`data-edit-snapshot`/`data-delete-snapshot` + `data-snapshot-*`), com `flex-wrap` na linha e `margin-left: auto` no grupo de ações.
 - Dados atuais (7 snapshots TREASURY, todos `MONTHLY_RECORD`) mostram a diferença calculada na segunda coluna (ex.: `+ R$ 546,51`).
 
 ### Referências
@@ -210,13 +211,13 @@ A tabela do Tesouro Direto ganhou uma primeira coluna (cabeçalho sem texto vis�
 - **Tipo**: Interface
 - **Status**: Ativa
 - **Criada em**: 2026-11-13
-- **Atualizada em**: 2026-11-16
-- **Tags**: `views`, `modal`, `bootstrap`, `toast`, `snapshots`, `registrar`, `javascript`
+- **Atualizada em**: 2026-11-18
+- **Tags**: `views`, `modal`, `bootstrap`, `toast`, `snapshots`, `registrar`, `editar`, `excluir`, `javascript`
 - **Fonte**: `src/views/components/registerSnapshotModal/`, `src/views/components/toast/`, `src/views/components/tesouroDiretoTable/view.eta`, `src/views/tesouroDireto/view.eta`, `src/utils/staticAssets.ts`
 
 ### Descrição
 
-O item `Guardar` do menu de opções da linha passou a se chamar `Registrar` e abre um modal Bootstrap que cria snapshots via `POST /api/snapshots`; o feedback usa um componente de toast próprio.
+O item `Registrar` do menu de opções da linha abre um modal Bootstrap que cria snapshots via `POST /api/snapshots`; o mesmo modal edita registros existentes via `PATCH`, e um modal dedicado os exclui via `DELETE` (soft delete). O feedback usa um componente de toast próprio.
 
 ### Detalhes
 
@@ -226,10 +227,14 @@ O item `Guardar` do menu de opções da linha passou a se chamar `Registrar` e a
 - `toastView` + `toast.js`: container `#toastStack` (`aria-live="polite"`), `window.AppToast.show({ variant, message })`, variantes `success`/`danger` com `--app-success`/`--app-danger`, auto-dismiss de 4 s e empilhamento no canto inferior direito.
 - A `<tr>` de cada investimento ganhou `data-venture-id`/`data-venture-name` e o botão de menu `data-register-venture`, permitindo a navegação de “próximo” sem duplicar dados no SSR.
 - `ViewsController.index` inclui `registerSnapshotModal.style` e `toastView.style` em `extraStyles`; os dois componentes são exportados por `src/views/components/index.ts`.
+- Modo edição do `registerSnapshotModal`: o botão `[data-edit-snapshot]` preenche `snapshotId`, tipo, valor (`currentTotalValue / 100`), data e nota; o título vira “Editar registro”, o `select` de tipo fica desabilitado, “Registrar e próximo” é ocultado e o submit vira “Confirmar”. O submit envia `PATCH` (sem `type`), mostra “Registro atualizado com sucesso.” e recarrega; `hidden.bs.modal` restaura o modo registro.
+- `deleteSnapshotModal` (componente `IViewConfig` novo): confirma exclusão com o aviso “Esta ação não é reversível” e botões `Cancelar`/`Excluir`; `modal.js` envia `DELETE /api/snapshots` com `{ ventureId, snapshotId }`, mostra “Registro excluído com sucesso.”, fecha e recarrega em sucesso, e mantém o modal aberto com toast de erro em falha.
+- `deleteSnapshotModal` está em `viewStyles` (`src/utils/staticAssets.ts`), em `extraStyles` do `ViewsController.index`, no barrel `src/views/components/index.ts` e em `src/views/tesouroDireto/view.eta`; o script é servido em `/views/components/deleteSnapshotModal/modal.js`.
 
 ### Referências
 
 - `src/views/components/registerSnapshotModal/{index.ts,view.eta,styles.css,modal.js}`
+- `src/views/components/deleteSnapshotModal/{index.ts,view.eta,styles.css,modal.js}`
 - `src/views/components/toast/{index.ts,view.eta,styles.css,toast.js}`
 - `src/utils/staticAssets.ts`, `src/views/views.controller.ts`
 - `#mem-2026-028`, `#mem-2026-029`, `#mem-2026-032`, `#mem-2026-033`

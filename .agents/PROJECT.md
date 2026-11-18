@@ -82,7 +82,7 @@ Estrutura em camadas para tratamento de requisições HTTP:
 | `controllers/` | Handlers de recursos sem visualização (API)                              |
 | `services/`    | Serviços de domínio (ventures, snapshots e export)                       |
 
-> Obs.: `controllers/` já possui `SnapshotsController` (`POST /api/snapshots`); `guards/` e `middlewares/` permanecem scaffold aguardando implementação. Os serviços de domínio vivem em `src/api/services/` e a renderização SSR fica em `src/views/views.controller.ts`.
+> Obs.: `controllers/` possui `SnapshotsController` (`POST`, `PATCH` e `DELETE /api/snapshots`) e `VenturesController` (`POST /api/ventures`); `guards/` e `middlewares/` permanecem scaffold aguardando implementação. Os serviços de domínio vivem em `src/api/services/` e a renderização SSR fica em `src/views/views.controller.ts`.
 
 ### `src/api/services/` — Serviços de domínio
 
