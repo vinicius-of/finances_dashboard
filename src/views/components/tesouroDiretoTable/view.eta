@@ -52,12 +52,6 @@
                             </li>
                             <li>
                                 <button type="button" class="venture-table__menu-item">
-                                    <i class="bi bi-cash-stack" aria-hidden="true"></i>
-                                    <span>Sacar</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button type="button" class="venture-table__menu-item">
                                     <i class="bi bi-archive" aria-hidden="true"></i>
                                     <span>Arquivar</span>
                                 </button>
