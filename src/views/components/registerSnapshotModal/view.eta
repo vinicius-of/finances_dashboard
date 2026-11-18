@@ -8,6 +8,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="ventureId" value="">
+                    <input type="hidden" name="snapshotId" value="">
                     <p class="register-snapshot__venture" id="registerSnapshotVenture"></p>
                     <div class="mb-3">
                         <label class="form-label" for="registerSnapshotType">Tipo de registro</label>

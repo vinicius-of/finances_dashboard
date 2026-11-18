@@ -16,6 +16,7 @@ import {
   toToolbarView,
 } from "@/src/views/components/tesouroDiretoToolbar";
 import { registerSnapshotModal } from "@/src/views/components/registerSnapshotModal";
+import { deleteSnapshotModal } from "@/src/views/components/deleteSnapshotModal";
 import {
   newVentureModal,
   toNewVentureModalView,
@@ -99,6 +100,7 @@ export class ViewsController {
         tesouroDiretoTable.style,
         newVentureModal.style,
         registerSnapshotModal.style,
+        deleteSnapshotModal.style,
         toastView.style,
       ],
     });

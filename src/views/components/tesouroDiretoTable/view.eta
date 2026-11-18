@@ -84,6 +84,16 @@
                                 <span><%= record.currentValueLabel %></span>
                             </span>
                             <span class="venture-table__record-notes"<% if (record.notes) { %> title="<%= record.notes %>"<% } %>><%= record.notes || "—" %></span>
+                            <span class="venture-table__record-actions">
+                                <button type="button" class="btn btn-sm btn-outline-secondary venture-table__record-action venture-table__record-action--edit" data-edit-snapshot data-venture-id="<%= record.ventureId %>" data-venture-name="<%= row.name %>" data-snapshot-id="<%= record.id %>" data-snapshot-type="<%= record.type %>" data-snapshot-value="<%= record.value %>" data-snapshot-date="<%= record.referenceDate %>" data-snapshot-notes="<%= record.notes ?? "" %>">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                                    <span>Editar</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary venture-table__record-action venture-table__record-action--delete" data-delete-snapshot data-venture-id="<%= record.ventureId %>" data-snapshot-id="<%= record.id %>" data-snapshot-date="<%= record.referenceDate %>">
+                                    <i class="bi bi-trash" aria-hidden="true"></i>
+                                    <span>Excluir</span>
+                                </button>
+                            </span>
                         </li>
                         <% }) %>
                     </ul>

@@ -1,3 +1,5 @@
+import type { SnapshotType } from "@/contracts";
+
 export interface IViewConfig {
   template: string;
   style: string;
@@ -16,6 +18,11 @@ export type NavItem = Pick<IPageViewConfig, "key" | "label" | "href" | "icon">;
 export type ProfitabilityTrend = "up" | "down" | "neutral";
 
 export interface ITesouroDiretoRecordRow {
+  id: string;
+  ventureId: string;
+  type: SnapshotType;
+  value: number;
+  referenceDate: string;
   dateLabel: string;
   differenceLabel: string;
   differenceTrend: ProfitabilityTrend;

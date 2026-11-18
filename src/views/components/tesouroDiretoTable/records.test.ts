@@ -167,6 +167,29 @@ describe("toTesouroDiretoRecordRows", () => {
     expect(rows.map((row) => row.notes)).toEqual(["mais novo", "mais antigo"]);
   });
 
+  it("expõe os dados crus necessários para editar e excluir o registro", () => {
+    const rows = toTesouroDiretoRecordRows(
+      [
+        makeSnapshot({
+          id: "snapshot-42",
+          ventureId: "venture-7",
+          referenceDate: new Date("2026-09-09T00:00:00.000Z"),
+          currentTotalValue: 120_000,
+          type: SnapshotType.CONTRIBUTION,
+          notes: "aporte",
+        }),
+      ],
+      100_000,
+    );
+
+    expect(rows[0]?.id).toBe("snapshot-42");
+    expect(rows[0]?.ventureId).toBe("venture-7");
+    expect(rows[0]?.type).toBe(SnapshotType.CONTRIBUTION);
+    expect(rows[0]?.value).toBe(120_000);
+    expect(rows[0]?.referenceDate).toBe("2026-09-09");
+    expect(rows[0]?.notes).toBe("aporte");
+  });
+
   it("retorna lista vazia quando não há registros", () => {
     expect(toTesouroDiretoRecordRows([], 100_000)).toEqual([]);
   });

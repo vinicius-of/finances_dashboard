@@ -1,0 +1,9 @@
+.delete-snapshot__warning {
+  color: var(--app-danger);
+  font-weight: 600;
+}
+
+.delete-snapshot__meta {
+  color: var(--bs-secondary-color);
+  font-size: 0.875rem;
+}

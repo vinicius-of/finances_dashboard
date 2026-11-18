@@ -1,0 +1,20 @@
+<div class="modal fade" id="deleteSnapshotModal" tabindex="-1" aria-labelledby="deleteSnapshotModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="deleteSnapshotModalTitle">Excluir registro</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Tem certeza de que deseja excluir este registro?</p>
+                <p class="delete-snapshot__warning mb-2">Esta ação não é reversível.</p>
+                <p class="delete-snapshot__meta mb-0" id="deleteSnapshotMeta"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" data-action="delete">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="/views/components/deleteSnapshotModal/modal.js"></script>

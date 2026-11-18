@@ -7,6 +7,7 @@ import { tesouroDiretoTable } from "@/src/views/components/tesouroDiretoTable";
 import { tesouroDiretoToolbar } from "@/src/views/components/tesouroDiretoToolbar";
 import { newVentureModal } from "@/src/views/components/newVentureModal";
 import { registerSnapshotModal } from "@/src/views/components/registerSnapshotModal";
+import { deleteSnapshotModal } from "@/src/views/components/deleteSnapshotModal";
 import { toastView } from "@/src/views/components/toast";
 import { tesouroDireto } from "@/src/views/tesouroDireto";
 import { rendasFixas } from "@/src/views/rendasFixas";
@@ -24,6 +25,7 @@ const viewStyles = [
   tesouroDiretoToolbar,
   newVentureModal,
   registerSnapshotModal,
+  deleteSnapshotModal,
   toastView,
 ];
 
@@ -56,6 +58,12 @@ export const staticAssetRoutes = {
     path.join(
       PROJECT_ROOT,
       "src/views/components/registerSnapshotModal/modal.js",
+    ),
+  ),
+  "/views/components/deleteSnapshotModal/modal.js": fileRoute(
+    path.join(
+      PROJECT_ROOT,
+      "src/views/components/deleteSnapshotModal/modal.js",
     ),
   ),
   "/views/components/newVentureModal/modal.js": fileRoute(

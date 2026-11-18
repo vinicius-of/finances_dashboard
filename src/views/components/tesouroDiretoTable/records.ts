@@ -49,6 +49,11 @@ export const toTesouroDiretoRecordRows = (
       const difference = snapshot.currentTotalValue - previousValue;
 
       const row: ITesouroDiretoRecordRow = {
+        id: snapshot.id,
+        ventureId: snapshot.ventureId,
+        type: snapshot.type,
+        value: snapshot.currentTotalValue,
+        referenceDate: snapshot.referenceDate.toISOString().slice(0, 10),
         dateLabel: formatDate(snapshot.referenceDate),
         differenceLabel: toDifferenceLabel(difference),
         differenceTrend: toDifferenceTrend(difference),
