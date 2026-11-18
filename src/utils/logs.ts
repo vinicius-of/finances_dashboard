@@ -128,6 +128,18 @@ export const log = {
       ].join(" "),
     );
   },
+
+  error(message: string, details: Record<string, unknown> = {}): void {
+    console.error(
+      [
+        appLabel(),
+        paint(localIsoTimestamp(), ANSI.dim),
+        paint("ERROR", ANSI.red),
+        message,
+        ...(Object.keys(details).length > 0 ? [JSON.stringify(details)] : []),
+      ].join(" "),
+    );
+  },
 };
 
 export function withRequestLog(

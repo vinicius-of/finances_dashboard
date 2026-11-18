@@ -51,6 +51,8 @@ const server = Bun.serve({
     ),
     "/api/snapshots": {
       POST: withRequestLog("json", (req) => snapshotsController.create(req)),
+      PATCH: withRequestLog("json", (req) => snapshotsController.update(req)),
+      DELETE: withRequestLog("json", (req) => snapshotsController.remove(req)),
     },
     "/api/ventures": {
       POST: withRequestLog("json", (req) => venturesController.create(req)),

@@ -44,9 +44,9 @@ export class SnapshotsService implements IService<
       case "save":
         return this.save(input.data);
       case "update":
-        return this.update(input.id, input.data);
+        return this.update(input.ventureId, input.id, input.data);
       case "softDelete":
-        return this.softDelete(input.id);
+        return this.softDelete(input.ventureId, input.id);
       case "get":
         return this.get(input.id);
       case "getAll":
@@ -104,12 +104,12 @@ export class SnapshotsService implements IService<
     return toSnapshot(row);
   }
 
-  update(id: string, data: UpdateSnapshotInput): IVentureSnapshot {
-    const existing = this.repository.get(id);
-
-    if (!existing) {
-      throw snapshotNotFound(id);
-    }
+  update(
+    ventureId: string,
+    id: string,
+    data: UpdateSnapshotInput,
+  ): IVentureSnapshot {
+    const existing = this.requireOwned(ventureId, id);
 
     const raw = data as unknown as Record<string, unknown>;
 
@@ -179,7 +179,9 @@ export class SnapshotsService implements IService<
     return this.repository.getAll().map(toSnapshot);
   }
 
-  softDelete(id: string): IVentureSnapshot {
+  softDelete(ventureId: string, id: string): IVentureSnapshot {
+    this.requireOwned(ventureId, id);
+
     const row = this.repository.softDelete(id);
 
     if (!row) {
@@ -208,6 +210,16 @@ export class SnapshotsService implements IService<
       latestValue: latest?.currentTotalValue ?? 0,
       totalProfitabilityPercentage: latest?.profitPercentage ?? 0,
     };
+  }
+
+  private requireOwned(ventureId: string, id: string): SelectVentureSnapshot {
+    const existing = this.repository.get(id);
+
+    if (!existing || existing.ventureId !== ventureId) {
+      throw snapshotNotFound(id);
+    }
+
+    return existing;
   }
 
   private latestRow(ventureId: string): SelectVentureSnapshot | undefined {

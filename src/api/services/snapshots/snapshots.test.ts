@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 import type {
   SelectVenture,
   SelectVentureSnapshot,
@@ -362,22 +362,41 @@ describe("SnapshotsService.save", () => {
 
 describe("SnapshotsService CRUD e tracking", () => {
   it("atualiza recalculando os derivados", () => {
-    const { service, state } = createService({
+    const { service, state, repository } = createService({
       snapshots: [makeSnapshotRow()],
     });
+    const patchSpy = spyOn(repository, "patch");
 
-    const result = service.update("snapshot-1", { currentTotalValue: 15000 });
+    const result = service.update("venture-1", "snapshot-1", {
+      currentTotalValue: 15000,
+    });
 
+    expect(patchSpy).toHaveBeenCalledTimes(1);
     expect(result.grossProfit).toBe(5000);
     expect(result.profitPercentage).toBe(50);
     expect(state[0]?.grossProfit).toBe(5000);
     expect(state[0]?.referenceDate).toBe("2026-09-30");
   });
 
+  it("retorna 404 ao atualizar snapshot de outra venture sem escrever", () => {
+    const { service, state, repository } = createService({
+      snapshots: [makeSnapshotRow({ ventureId: "venture-2" })],
+    });
+    const patchSpy = spyOn(repository, "patch");
+
+    const error = catchApiError(() =>
+      service.update("venture-1", "snapshot-1", { currentTotalValue: 15000 }),
+    );
+
+    expect(error.statusCode).toBe(404);
+    expect(patchSpy).not.toHaveBeenCalled();
+    expect(state[0]?.currentTotalValue).toBe(12000);
+  });
+
   it("rejeita alteração de type/movementValue com 400", () => {
     const { service } = createService({ snapshots: [makeSnapshotRow()] });
     const error = catchApiError(() =>
-      service.update("snapshot-1", {
+      service.update("venture-1", "snapshot-1", {
         type: "WITHDRAWAL",
       } as unknown as UpdateSnapshotInput),
     );
@@ -388,7 +407,7 @@ describe("SnapshotsService CRUD e tracking", () => {
   it("retorna 404 ao atualizar snapshot inexistente", () => {
     const { service } = createService();
     const error = catchApiError(() =>
-      service.update("missing", { currentTotalValue: 1 }),
+      service.update("venture-1", "missing", { currentTotalValue: 1 }),
     );
 
     expect(error.statusCode).toBe(404);
@@ -406,15 +425,32 @@ describe("SnapshotsService CRUD e tracking", () => {
       snapshots: [makeSnapshotRow()],
     });
 
-    const result = service.softDelete("snapshot-1");
+    const result = service.softDelete("venture-1", "snapshot-1");
 
     expect(result.id).toBe("snapshot-1");
     expect(state[0]?.deletedAt).toBe(now);
   });
 
+  it("retorna 404 ao fazer softDelete de snapshot de outra venture sem escrever", () => {
+    const { service, state, repository } = createService({
+      snapshots: [makeSnapshotRow({ ventureId: "venture-2" })],
+    });
+    const softDeleteSpy = spyOn(repository, "softDelete");
+
+    const error = catchApiError(() =>
+      service.softDelete("venture-1", "snapshot-1"),
+    );
+
+    expect(error.statusCode).toBe(404);
+    expect(softDeleteSpy).not.toHaveBeenCalled();
+    expect(state[0]?.deletedAt).toBeNull();
+  });
+
   it("retorna 404 ao fazer softDelete de snapshot inexistente", () => {
     const { service } = createService();
-    const error = catchApiError(() => service.softDelete("missing"));
+    const error = catchApiError(() =>
+      service.softDelete("venture-1", "missing"),
+    );
 
     expect(error.statusCode).toBe(404);
   });

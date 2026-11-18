@@ -1,6 +1,9 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 import type { IVentureSnapshot } from "@/contracts";
-import type { SnapshotInput } from "@/src/api/services/snapshots/snapshots.types";
+import type {
+  SnapshotInput,
+  UpdateSnapshotInput,
+} from "@/src/api/services/snapshots/snapshots.types";
 import { ApiError } from "@/src/errors/ApiError";
 import { SnapshotsController } from "./snapshots.controller";
 import type {
@@ -234,5 +237,314 @@ describe("SnapshotsController.create", () => {
       field: "movementValue",
       rule: "required",
     });
+  });
+});
+
+const updatePayload = (overrides: Record<string, unknown> = {}) => ({
+  ventureId: "venture-1",
+  snapshotId: "snapshot-1",
+  value: 15000,
+  referenceDate: "2026-11-18",
+  notes: "ajuste",
+  ...overrides,
+});
+
+const deletePayload = (overrides: Record<string, unknown> = {}) => ({
+  ventureId: "venture-1",
+  snapshotId: "snapshot-1",
+  ...overrides,
+});
+
+const jsonBody = (body: unknown) =>
+  typeof body === "string" ? body : JSON.stringify(body);
+
+const patchRequest = (body: unknown) =>
+  new Request("http://localhost/api/snapshots", {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: jsonBody(body),
+  });
+
+const deleteRequest = (body?: unknown) =>
+  new Request("http://localhost/api/snapshots", {
+    method: "DELETE",
+    headers: { "content-type": "application/json" },
+    ...(body === undefined ? {} : { body: jsonBody(body) }),
+  });
+
+const createCommands = () => {
+  const updates: {
+    ventureId: string;
+    id: string;
+    data: UpdateSnapshotInput;
+  }[] = [];
+  const deletions: { ventureId: string; id: string }[] = [];
+
+  const commands = {
+    save: (data: SnapshotInput) =>
+      makeSnapshot({
+        ventureId: data.ventureId,
+        type: data.type,
+        referenceDate: data.referenceDate,
+        currentTotalValue: data.currentTotalValue ?? 0,
+      }),
+    update: (ventureId: string, id: string, data: UpdateSnapshotInput) => {
+      updates.push({ ventureId, id, data });
+
+      return makeSnapshot({
+        id,
+        ventureId,
+        ...(data.currentTotalValue === undefined
+          ? {}
+          : { currentTotalValue: data.currentTotalValue }),
+      });
+    },
+    softDelete: (ventureId: string, id: string) => {
+      deletions.push({ ventureId, id });
+
+      return makeSnapshot({ id, ventureId });
+    },
+  };
+
+  return { commands, updates, deletions };
+};
+
+describe("SnapshotsController.update", () => {
+  it("atualiza currentTotalValue a partir de value e devolve 200", async () => {
+    const { commands, updates } = createCommands();
+    const controller = new SnapshotsController(commands);
+    const response = await controller.update(patchRequest(updatePayload()));
+    const body = (await response.json()) as ResponseBody;
+
+    expect(response.status).toBe(200);
+    expect(body.snapshot?.id).toBe("snapshot-1");
+    expect(updates).toHaveLength(1);
+    expect(updates[0]?.ventureId).toBe("venture-1");
+    expect(updates[0]?.id).toBe("snapshot-1");
+    expect(updates[0]?.data.currentTotalValue).toBe(15000);
+    expect(updates[0]?.data.referenceDate?.toISOString()).toBe(
+      "2026-11-18T00:00:00.000Z",
+    );
+    expect(updates[0]?.data.notes).toBe("ajuste");
+  });
+
+  it("envia notes vazio para limpar a nota do registro", async () => {
+    const { commands, updates } = createCommands();
+    const controller = new SnapshotsController(commands);
+
+    await controller.update(patchRequest(updatePayload({ notes: "" })));
+
+    expect(updates[0]?.data.notes).toBe("");
+  });
+
+  it("ignora type e movementValue enviados no corpo", async () => {
+    const { commands, updates } = createCommands();
+    const controller = new SnapshotsController(commands);
+
+    await controller.update(
+      patchRequest(updatePayload({ type: "WITHDRAWAL", movementValue: 9999 })),
+    );
+
+    expect("type" in (updates[0]?.data ?? {})).toBe(false);
+    expect("movementValue" in (updates[0]?.data ?? {})).toBe(false);
+  });
+
+  it("retorna 400 quando ventureId ou snapshotId estão ausentes", async () => {
+    const { commands } = createCommands();
+    const controller = new SnapshotsController(commands);
+
+    for (const overrides of [
+      { ventureId: undefined },
+      { ventureId: "  " },
+      { snapshotId: undefined },
+      { snapshotId: "  " },
+    ]) {
+      const response = await controller.update(
+        patchRequest(updatePayload(overrides)),
+      );
+      const body = (await response.json()) as IErrorBody;
+
+      expect(response.status).toBe(400);
+      expect(["ventureId", "snapshotId"]).toContain(
+        String(body.details?.field),
+      );
+    }
+  });
+
+  it("retorna 400 quando value não é um inteiro positivo", async () => {
+    const { commands } = createCommands();
+    const controller = new SnapshotsController(commands);
+
+    for (const value of [undefined, 0, -5, 12.5, "1000"]) {
+      const response = await controller.update(
+        patchRequest(updatePayload({ value })),
+      );
+      const body = (await response.json()) as IErrorBody;
+
+      expect(response.status).toBe(400);
+      expect(body.details?.field).toBe("value");
+    }
+  });
+
+  it("retorna 400 quando referenceDate está ausente ou inválida", async () => {
+    const { commands } = createCommands();
+    const controller = new SnapshotsController(commands);
+
+    for (const referenceDate of [undefined, "", "2026-13-45", "18/11/2026"]) {
+      const response = await controller.update(
+        patchRequest(updatePayload({ referenceDate })),
+      );
+      const body = (await response.json()) as IErrorBody;
+
+      expect(response.status).toBe(400);
+      expect(body.details?.field).toBe("referenceDate");
+    }
+  });
+
+  it("retorna 400 quando notes excede 280 caracteres", async () => {
+    const { commands } = createCommands();
+    const controller = new SnapshotsController(commands);
+    const overflow = await controller.update(
+      patchRequest(updatePayload({ notes: "a".repeat(281) })),
+    );
+    const overflowBody = (await overflow.json()) as IErrorBody;
+    const limit = await controller.update(
+      patchRequest(updatePayload({ notes: "a".repeat(280) })),
+    );
+
+    expect(overflow.status).toBe(400);
+    expect(overflowBody.details?.field).toBe("notes");
+    expect(limit.status).toBe(200);
+  });
+
+  it("retorna 400 quando o corpo não é JSON válido", async () => {
+    const { commands } = createCommands();
+    const controller = new SnapshotsController(commands);
+    const response = await controller.update(patchRequest("{nao-json"));
+    const body = (await response.json()) as IErrorBody;
+
+    expect(response.status).toBe(400);
+    expect(body.details?.field).toBe("body");
+  });
+
+  it("propaga 404 do service e registra log de manutenção", async () => {
+    const errorSpy = spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      const { commands } = createCommands();
+      const controller = new SnapshotsController({
+        ...commands,
+        update: () => {
+          throw new ApiError(404, "Snapshot não encontrado", {
+            id: "snapshot-1",
+          });
+        },
+      });
+      const response = await controller.update(patchRequest(updatePayload()));
+      const body = (await response.json()) as IErrorBody;
+      const logged = errorSpy.mock.calls.flat().join(" ");
+
+      expect(response.status).toBe(404);
+      expect(body.message).toBe("Snapshot não encontrado");
+      expect(errorSpy).toHaveBeenCalled();
+      expect(logged).toContain("snapshot-1");
+      expect(logged).toContain("404");
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it("registra log e repropaga erro inesperado", async () => {
+    const errorSpy = spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      const { commands } = createCommands();
+      const controller = new SnapshotsController({
+        ...commands,
+        update: () => {
+          throw new Error("boom");
+        },
+      });
+
+      await expect(
+        controller.update(patchRequest(updatePayload())),
+      ).rejects.toThrow("boom");
+      expect(errorSpy).toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+});
+
+describe("SnapshotsController.remove", () => {
+  it("faz soft delete com ventureId e snapshotId e devolve 200", async () => {
+    const { commands, deletions } = createCommands();
+    const controller = new SnapshotsController(commands);
+    const response = await controller.remove(deleteRequest(deletePayload()));
+    const body = (await response.json()) as ResponseBody;
+
+    expect(response.status).toBe(200);
+    expect(body.snapshot?.id).toBe("snapshot-1");
+    expect(deletions).toEqual([{ ventureId: "venture-1", id: "snapshot-1" }]);
+  });
+
+  it("retorna 400 quando ventureId ou snapshotId estão ausentes", async () => {
+    const { commands, deletions } = createCommands();
+    const controller = new SnapshotsController(commands);
+
+    for (const overrides of [
+      { ventureId: undefined },
+      { ventureId: "  " },
+      { snapshotId: undefined },
+      { snapshotId: "  " },
+    ]) {
+      const response = await controller.remove(
+        deleteRequest(deletePayload(overrides)),
+      );
+      const body = (await response.json()) as IErrorBody;
+
+      expect(response.status).toBe(400);
+      expect(["ventureId", "snapshotId"]).toContain(
+        String(body.details?.field),
+      );
+    }
+
+    expect(deletions).toHaveLength(0);
+  });
+
+  it("retorna 400 quando o corpo não é JSON válido", async () => {
+    const { commands } = createCommands();
+    const controller = new SnapshotsController(commands);
+    const response = await controller.remove(deleteRequest("{nao-json"));
+    const body = (await response.json()) as IErrorBody;
+
+    expect(response.status).toBe(400);
+    expect(body.details?.field).toBe("body");
+  });
+
+  it("propaga 404 do service e registra log de manutenção", async () => {
+    const errorSpy = spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      const { commands } = createCommands();
+      const controller = new SnapshotsController({
+        ...commands,
+        softDelete: () => {
+          throw new ApiError(404, "Snapshot não encontrado", {
+            id: "snapshot-1",
+          });
+        },
+      });
+      const response = await controller.remove(deleteRequest(deletePayload()));
+      const body = (await response.json()) as IErrorBody;
+      const logged = errorSpy.mock.calls.flat().join(" ");
+
+      expect(response.status).toBe(404);
+      expect(body.message).toBe("Snapshot não encontrado");
+      expect(logged).toContain("snapshot-1");
+      expect(logged).toContain("404");
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });

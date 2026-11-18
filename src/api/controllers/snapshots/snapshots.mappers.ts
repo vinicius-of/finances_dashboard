@@ -1,6 +1,12 @@
 import { SnapshotType } from "@/contracts";
-import type { SnapshotInput } from "@/src/api/services/snapshots/snapshots.types";
-import type { IParsedSnapshotPayload } from "./snapshots.controller.types";
+import type {
+  SnapshotInput,
+  UpdateSnapshotInput,
+} from "@/src/api/services/snapshots/snapshots.types";
+import type {
+  IParsedSnapshotPayload,
+  IParsedSnapshotUpdatePayload,
+} from "./snapshots.controller.types";
 
 export const toSnapshotInput = (
   payload: IParsedSnapshotPayload,
@@ -16,3 +22,11 @@ export const toSnapshotInput = (
     ? { ...input, currentTotalValue: payload.value }
     : { ...input, movementValue: payload.value };
 };
+
+export const toUpdateSnapshotInput = (
+  payload: IParsedSnapshotUpdatePayload,
+): UpdateSnapshotInput => ({
+  currentTotalValue: payload.value,
+  referenceDate: payload.referenceDate,
+  notes: payload.notes ?? "",
+});

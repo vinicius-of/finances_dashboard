@@ -1,5 +1,9 @@
 import { SnapshotType } from "@/contracts";
-import type { IParsedSnapshotPayload } from "./snapshots.controller.types";
+import type {
+  IParsedSnapshotDeletePayload,
+  IParsedSnapshotPayload,
+  IParsedSnapshotUpdatePayload,
+} from "./snapshots.controller.types";
 import { invalidField } from "./snapshots.errors";
 
 const NOTES_MAX_LENGTH = 280;
@@ -50,6 +54,14 @@ const parseNotes = (value: unknown): string | undefined => {
   return value;
 };
 
+const parseRequiredId = (value: unknown, field: string): string => {
+  if (typeof value !== "string" || value.trim() === "") {
+    throw invalidField(field, "required", `${field} é obrigatório`);
+  }
+
+  return value.trim();
+};
+
 export const parseSnapshotPayload = (raw: unknown): IParsedSnapshotPayload => {
   if (!isRecord(raw)) {
     throw invalidField("body", "object", "Payload inválido");
@@ -79,5 +91,49 @@ export const parseSnapshotPayload = (raw: unknown): IParsedSnapshotPayload => {
     value,
     referenceDate: parseReferenceDate(referenceDate),
     notes: parseNotes(notes),
+  };
+};
+
+export const parseSnapshotUpdatePayload = (
+  raw: unknown,
+): IParsedSnapshotUpdatePayload => {
+  if (!isRecord(raw)) {
+    throw invalidField("body", "object", "Payload inválido");
+  }
+
+  const { ventureId, snapshotId, value, referenceDate, notes } = raw;
+
+  const parsedVentureId = parseRequiredId(ventureId, "ventureId");
+  const parsedSnapshotId = parseRequiredId(snapshotId, "snapshotId");
+
+  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) {
+    throw invalidField(
+      "value",
+      "integer_positive",
+      "value deve ser um inteiro positivo",
+    );
+  }
+
+  return {
+    ventureId: parsedVentureId,
+    snapshotId: parsedSnapshotId,
+    value,
+    referenceDate: parseReferenceDate(referenceDate),
+    notes: parseNotes(notes),
+  };
+};
+
+export const parseSnapshotDeletePayload = (
+  raw: unknown,
+): IParsedSnapshotDeletePayload => {
+  if (!isRecord(raw)) {
+    throw invalidField("body", "object", "Payload inválido");
+  }
+
+  const { ventureId, snapshotId } = raw;
+
+  return {
+    ventureId: parseRequiredId(ventureId, "ventureId"),
+    snapshotId: parseRequiredId(snapshotId, "snapshotId"),
   };
 };

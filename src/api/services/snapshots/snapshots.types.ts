@@ -45,14 +45,29 @@ export interface IVentureSnapshotsRepository {
 
 export type SnapshotsServiceInput =
   | { action: "save"; data: SnapshotInput }
-  | { action: "update"; id: string; data: UpdateSnapshotInput }
-  | { action: "softDelete"; id: string }
+  | {
+      action: "update";
+      ventureId: string;
+      id: string;
+      data: UpdateSnapshotInput;
+    }
+  | { action: "softDelete"; ventureId: string; id: string }
   | { action: "get"; id: string }
   | { action: "getAll" }
   | { action: "tracking"; ventureId: string };
 
 export type SnapshotsServiceOutput =
   void | IVentureSnapshot | IVentureSnapshot[] | IVentureTracking;
+
+export interface ISnapshotCommands {
+  save(data: SnapshotInput): IVentureSnapshot;
+  update(
+    ventureId: string,
+    id: string,
+    data: UpdateSnapshotInput,
+  ): IVentureSnapshot;
+  softDelete(ventureId: string, id: string): IVentureSnapshot;
+}
 
 export interface SnapshotsServiceDependencies {
   venturesReader: IVenturesReader;
